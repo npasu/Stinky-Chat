@@ -15,7 +15,15 @@ const UserSchema = new mongoose.Schema(
         socketId: {
             type: String,
             required: true,
-        }
+        },
+
+        // Avatar ID
+        avatarId: {
+            type: Number,
+            default: 1,
+            min: 1,
+            max: 5,
+        },
     },
     {
         // Timestamp for created at and updated at
