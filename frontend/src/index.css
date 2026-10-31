@@ -1,0 +1,80 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+@import "tailwindcss";
+
+:root {
+  /* Colors */
+  --color-primary-blue: #8bd0fc;
+  --color-primary-yellow: #fce76c;
+  --color-primary-orange: #ff8f5c;
+
+  --color-dark-blue: #7dbbe3;
+  --color-dark-yellow: #e3d061;
+  --color-dark-orange: #e68153;
+
+  --color-black: #1f1e22;
+  --color-white: #ffffff;
+  --color-gray: #f4f4f4;
+  --color-dark-gray: #c3c3c3;
+
+  /* Typography */
+  --font-primary: "Poppins", sans-serif;
+
+  --text-h1: 48px;
+  --text-h2: 30px;
+  --text-h3: 24px;
+  --text-body: 18px;
+  --text-caption: 14px;
+  --text-small: 14px;
+  --text-button: 14px;
+  --text-subtle: 14px;
+
+  /* Border Radius */
+  --radius-card: 12px;
+  --radius-button: 8px;
+
+  /* Shadow */
+  --shadow-card: 0 4.5px 12px 0 rgba(0, 0, 0, 0.5);
+}
+
+@theme {
+  /* Colors */
+  --color-primary-blue: var(--color-primary-blue);
+  --color-primary-yellow: var(--color-primary-yellow);
+  --color-primary-orange: var(--color-primary-orange);
+
+  --color-dark-blue: var(--color-dark-blue);
+  --color-dark-yellow: var(--color-dark-yellow);
+  --color-dark-orange: var(--color-dark-orange);
+
+  --color-black: var(--color-black);
+  --color-white: var(--color-white);
+  --color-gray: var(--color-gray);
+  --color-dark-gray: var(--color-dark-gray);
+
+  /* Typography */
+  --font-primary: var(--font-primary);
+
+  --text-h1: var(--text-h1);
+  --text-h2: var(--text-h2);
+  --text-h3: var(--text-h3);
+  --text-body: var(--text-body);
+  --text-caption: var(--text-caption);
+  --text-small: var(--text-small);
+  --text-button: var(--text-button);
+  --text-subtle: var(--text-subtle);
+
+  /* Border Radius */
+  --radius-card: var(--radius-card);
+  --radius-button: var(--radius-button);
+
+  /* Shadow */
+  --shadow-card: var(--shadow-card);
+}
+
+/* Global Styles */
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-primary-blue);
+  color: var(--color-black);
+}
