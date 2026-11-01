@@ -21,7 +21,7 @@ export function Button({
     <button
       {...props}
       disabled={disabled}
-      className={`${colorClass[currentColor]} ${fullRound ? "rounded-full" : "rounded-xl"} flex items-center justify-center gap-2 px-12 py-2 text-button transition-colors ${disabled ? "cursor-not-allowed" : "cursor-pointer hover:brightness-90 shadow-button"} ${className}`}
+      className={`${colorClass[currentColor]} ${fullRound ? "rounded-full" : "rounded-xl"} flex items-center justify-center gap-2 px-12 py-2 text-button transition-colors ${disabled ? "cursor-not-allowed" : "cursor-pointer hover:brightness-90 hover:scale-105 active:scale-95 shadow-button"} ${className}`}
     >
       {icon && <span>{icon}</span>}
       {children}
