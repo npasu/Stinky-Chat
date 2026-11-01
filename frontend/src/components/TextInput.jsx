@@ -4,10 +4,11 @@ export function TextInput({
   type = "text",
   className = "",
   multiline = false,
+  borderWeight = "border-2",
   ...props
 }) {
   const commonClasses = `
-    w-full rounded-full border-2 border-black px-5 py-3 text-subtle
+    ${borderWeight} rounded-full border-black px-5 py-3 text-subtle focus:outline-none focus:ring-0
     ${className}
   `;
 

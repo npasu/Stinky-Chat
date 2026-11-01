@@ -21,7 +21,7 @@ export function ChatList({
       {...props}
       className={`${colorClass[currentColor]} w-full rounded-full flex items-center justify-between gap-2 px-6 py-4 text-button transition-colors cursor-pointer hover:brightness-90 ${className}`}
     >
-      <div>
+      <div className="flex items-center gap-6 font-medium text-body">
         {profileIcon && <span>{profileIcon}</span>}
         {name}
       </div>

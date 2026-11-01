@@ -10,6 +10,7 @@ function App() {
       <Route path="/" element={<Entry />} />
       <Route path="/home" element={<Home />} />
       <Route path="/chat" element={<Chat />} />
+      <Route path="/chat/:conversationId" element={<Chat />} />
     </Routes>
   );
 }

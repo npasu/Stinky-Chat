@@ -14,6 +14,7 @@ export function Button({
     transparent: "",
     yellow: "bg-primary-yellow text-black",
     blue: "bg-primary-blue text-black",
+    orange: "bg-primary-orange text-black",
     black: "bg-black border-2 border-black text-white",
     white: "bg-white border-2 border-black text-black",
 

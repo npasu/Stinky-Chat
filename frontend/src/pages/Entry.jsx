@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { TextInput } from "../components/TextInput";
 import { Button } from "../components/Button";
 
-function App() {
+function Entry() {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [selectedProfile, setSelectedProfile] = useState(0);
 
@@ -19,8 +20,13 @@ function App() {
     "/profile5.svg",
   ];
 
+  const handleStart = (name) => {
+    if (name === "test") setErrorMsg(`"${name}" is already existed`);
+    else navigate("/home");
+  };
+
   return (
-    <div className="min-h-screen min-w-screen flex  justify-center items-center">
+    <div className="w-screen h-dvh flex justify-center items-center">
       <div
         className={`bg-white p-8 shadow-card relative flex flex-col space-y-4 rounded-3xl w-[30%] min-w-[450px] min-h-[380px] max-w-[1200px] justify-center items-center`}
       >
@@ -50,11 +56,17 @@ function App() {
           Stinky Chat
         </p>
         <div className="space-y-2 w-full">
-          <p className="text-h3 font-semibold text-black self-start">Name</p>
+          <div className="flex items-center gap-2">
+            <p className="text-h3 font-semibold text-black self-start">Name</p>
+            <p className="text-subtle font-thin text-primary-orange">
+              {errorMsg}
+            </p>
+          </div>
           <TextInput
             value={name}
             onChange={setName}
             placeholder="Enter your name"
+            className="w-full"
           />
         </div>
         <div className="space-y-2 w-full">
@@ -63,6 +75,7 @@ function App() {
           <div className="flex justify-between items-center w-full">
             {catProfiles.map((cat, index) => (
               <Button
+                key={index}
                 fullRound={true}
                 onClick={() => setSelectedProfile(index)}
                 hideShadow={true}
@@ -87,7 +100,7 @@ function App() {
           color="yellow"
           disabled={name === ""}
           className="font-medium"
-          onClick={() => navigate("/home")}
+          onClick={() => handleStart(name)}
         >
           Start
         </Button>
@@ -96,4 +109,4 @@ function App() {
   );
 }
 
-export default App;
+export default Entry;

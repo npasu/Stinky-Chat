@@ -1,56 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Plus } from "lucide-react";
+import { Plus, UserRoundGroup } from "lucide-react";
 
 import { SelectButton } from "../components/SelectButton";
 import { Button } from "../components/Button";
 import { ChatList } from "../components/ChatList";
 
-const chatListMock = [
-  {
-    id: "conv_001",
-    type: "direct",
-    participants: ["user_001", "user_002"],
-    name: "aa",
-  },
-  {
-    id: "conv_001",
-    type: "direct",
-    participants: ["user_001", "user_002"],
-    name: "aa",
-  },
-  {
-    id: "conv_002",
-    type: "direct",
-    participants: ["user_001", "user_002"],
-    name: "aa",
-  },
-  {
-    id: "conv_003",
-    type: "direct",
-    participants: ["user_001", "user_002"],
-    name: "aa",
-  },
-  {
-    id: "conv_004",
-    type: "group",
-    participants: ["user_001", "user_002"],
-    name: "aa",
-  },
-  {
-    id: "conv_005",
-    type: "group",
-    participants: ["user_001", "user_002"],
-    name: "aa",
-  },
-];
-function App() {
+import ChatListMock from "../components/ChatListMock";
+
+function Home() {
   const navigate = useNavigate();
-  const [chatType, setChatType] = useState("CHAT");
+  const [chatType, setChatType] = useState("DIRECT");
 
   return (
-    <div className="h-dvh w-full overflow-hidden flex flex-col items-center">
+    <div className="w-screen h-dvh overflow-hidden flex flex-col items-center">
       {/* Cat ears and header text */}
       <div className="relative w-full shrink-0 flex justify-center">
         <p className="absolute top-0 z-10 w-full mt-1 text-[4vw] max-w-[60%] font-semibold text-center whitespace-nowrap">
@@ -71,10 +35,10 @@ function App() {
       <div className="z-20 absolute  w-[94%] flex justify-between top-[12vw] px-[3vw]">
         <div className="flex gap-[2vw]">
           <SelectButton
-            color={chatType === "CHAT" ? "black" : "white"}
+            color={chatType === "DIRECT" ? "black" : "white"}
             className="font-medium text-button"
             onClick={() => {
-              setChatType("CHAT");
+              setChatType("DIRECT");
             }}
           >
             Online Friends
@@ -104,17 +68,21 @@ function App() {
       </div>
       <div className="relative z-10 bg-white w-[94%] flex-1 min-h-0 -mt-[2px] overflow-y-auto overflow-x-hidden overscroll-contain">
         <div className="p-4 flex flex-col gap-3">
-          {chatListMock.map((option) => (
-            <ChatList
-              key={option.id}
-              name={option.name}
-              onClick={() => navigate("/chat")}
-            />
-          ))}
+          {ChatListMock.map(
+            (option) =>
+              option.type === chatType && (
+                <ChatList
+                  key={option.id}
+                  name={option.name}
+                  profileIcon={<UserRoundGroup size={56} strokeWidth={1} />}
+                  onClick={() => navigate(`/chat/${option.id}`)}
+                />
+              ),
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export default App;
+export default Home;
