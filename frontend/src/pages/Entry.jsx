@@ -62,14 +62,16 @@ function App() {
           {/** 5 cat profiles */}
           <div className="flex justify-between items-center w-full">
             {catProfiles.map((cat, index) => (
-              <button
-                key={index}
-                type="button"
+              <Button
+                fullRound={true}
                 onClick={() => setSelectedProfile(index)}
-                className={`rounded-full border-2 transition-all duration-200 focus:outline-none ${
+                hideShadow={true}
+                px={0}
+                py={0}
+                className={`${
                   selectedProfile === index
-                    ? "border-black"
-                    : "border-transparent hover:border-gray-200"
+                    ? "border-black border-2"
+                    : "border-transparent hover:border-gray-200 border-2"
                 }`}
               >
                 <img
@@ -77,7 +79,7 @@ function App() {
                   alt={`Cat profile ${index + 1}`}
                   className="w-12 h-12 rounded-full object-cover"
                 />
-              </button>
+              </Button>
             ))}
           </div>
         </div>

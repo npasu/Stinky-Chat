@@ -9,24 +9,40 @@ import { ChatList } from "../components/ChatList";
 
 const chatListMock = [
   {
-    id: 1,
-    name: "aaaa",
+    id: "conv_001",
+    type: "direct",
+    participants: ["user_001", "user_002"],
+    name: "aa",
   },
   {
-    id: 1,
-    name: "aaaa",
+    id: "conv_001",
+    type: "direct",
+    participants: ["user_001", "user_002"],
+    name: "aa",
   },
   {
-    id: 2,
-    name: "bbb",
+    id: "conv_002",
+    type: "direct",
+    participants: ["user_001", "user_002"],
+    name: "aa",
   },
   {
-    id: 3,
-    name: "ccc",
+    id: "conv_003",
+    type: "direct",
+    participants: ["user_001", "user_002"],
+    name: "aa",
   },
   {
-    id: 4,
-    name: "ddd",
+    id: "conv_004",
+    type: "group",
+    participants: ["user_001", "user_002"],
+    name: "aa",
+  },
+  {
+    id: "conv_005",
+    type: "group",
+    participants: ["user_001", "user_002"],
+    name: "aa",
   },
 ];
 function App() {

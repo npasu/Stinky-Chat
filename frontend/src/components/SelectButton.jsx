@@ -1,3 +1,5 @@
+import { Button } from "../components/Button";
+
 export function SelectButton({
   children,
   icon,
@@ -12,13 +14,17 @@ export function SelectButton({
   };
 
   return (
-    <button
+    <Button
       {...props}
       disabled={disabled}
-      className={`${colorClass[color]} rounded-full flex items-center justify-center gap-2 py-2 px-4 w-36 text-button transition-colors ${disabled ? "cursor-not-allowed" : "cursor-pointer hover:brightness-90"} ${className}`}
+      icon={icon}
+      className={className}
+      color={color}
+      px="px-4"
+      hideShadow={true}
+      fullRound={true}
     >
-      {icon && <span>{icon}</span>}
       {children}
-    </button>
+    </Button>
   );
 }
