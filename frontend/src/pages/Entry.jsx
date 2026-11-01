@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
 
 import { TextInput } from "../components/TextInput";
 import { Button } from "../components/Button";
@@ -86,7 +85,7 @@ function App() {
           color="yellow"
           disabled={name === ""}
           className="font-medium"
-          onClick={() => navigate("/chat")}
+          onClick={() => navigate("/home")}
         >
           Start
         </Button>

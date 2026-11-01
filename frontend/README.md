@@ -23,8 +23,6 @@ frontend/
 │ ├── assets/
 │ │
 │ ├── components/
-│ │ ├── common/
-│ │ └── layout/
 │ │
 │ ├── pages/
 │ │

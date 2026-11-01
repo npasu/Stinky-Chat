@@ -7,7 +7,7 @@ export function TextInput({
   ...props
 }) {
   const commonClasses = `
-    w-full rounded-full border-2 border-primary-blue px-5 py-3 text-subtle
+    w-full rounded-full border-2 border-black px-5 py-3 text-subtle
     ${className}
   `;
 
