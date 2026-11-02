@@ -23,7 +23,7 @@ const groupMessageSchema = new mongoose.Schema(
             required: [true, 'Please add message text'],
         },
 
-        // Emoji Reactions: { "👍": ["Alice", "Bob"] }
+        // Emoji Reactions: { "like": ["Alice", "Bob"] }
         reactions: {
             type: Map,
             of: [String],
