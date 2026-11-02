@@ -8,6 +8,7 @@ import { Button } from "../components/Button";
 import { ChatList } from "../components/ChatList";
 
 import { CreateGroupPopUp } from "../components/CreateGroupPopUp";
+import { ViewMembersPopUp } from "../components/ViewMembersPopUp";
 
 import ChatListMock from "../components/ChatListMock";
 
@@ -16,6 +17,8 @@ function Home() {
   const [chatType, setChatType] = useState("DIRECT");
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const [isMembersPopupOpen, setIsMembersPopupOpen] = useState(false);
 
   const handleCreateGroup = (groupName) => {
     console.log("New group created:", groupName);
@@ -85,7 +88,8 @@ function Home() {
                   key={option.id}
                   name={option.name}
                   profileIcon={<UserRoundGroup size={56} strokeWidth={1} />}
-                  onClick={() => navigate(`/chat/${option.id}`)}
+                  onChatClick={() => navigate(`/chat/${option.id}`)}
+                  onMembersClick={() => { setIsMembersPopupOpen(true)}}
                   isGroup={option.type === "GROUP"}
                 />
               ),
@@ -97,6 +101,9 @@ function Home() {
           onCancel={() => setIsPopupOpen(false)} 
           onConfirm={handleCreateGroup} 
         />
+      )}
+      {isMembersPopupOpen && (
+        <ViewMembersPopUp onConfirm={() => setIsMembersPopupOpen(false)} />
       )}
     </div>
   );
