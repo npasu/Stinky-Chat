@@ -6,6 +6,8 @@ import { ChatHeader } from "../components/Chatpage/ChatHeader";
 import { ChatFooter } from "../components/Chatpage/ChatFooter";
 import { ChatBox } from "../components/Chatpage/ChatBox";
 
+import { DeleteGroupPopUp } from "../components/DeleteGroupPopUp";
+
 import ChatMock from "../components/ChatMock";
 
 export default function Chat() {
@@ -14,6 +16,8 @@ export default function Chat() {
   const chatContainerRef = useRef(null);
 
   const [message, setMessage] = useState("");
+
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
   const scrollToBottom = () => {
     chatContainerRef.current?.scrollTo({
@@ -39,6 +43,14 @@ export default function Chat() {
     console.log("Recording");
   };
 
+  const handleDeleteConfirm = () => {
+    console.log("Deleting group:", conversationId);
+    // TODO: 
+    
+    setIsDeletePopupOpen(false); 
+    navigate("/home"); 
+  };
+
   return (
     <div className="w-screen h-dvh flex justify-center items-center">
       {conversationId ? (
@@ -46,6 +58,7 @@ export default function Chat() {
           <ChatHeader
             conversationId={conversationId}
             toHome={() => navigate("/home")}
+            onDeleteClick={() => setIsDeletePopupOpen(true)}
           />
           <div
             ref={chatContainerRef}
@@ -74,6 +87,12 @@ export default function Chat() {
           toHome={() => navigate("/home")}
           toEntry={() => navigate("/")}
         />
+      )}
+      {isDeletePopupOpen && (
+         <DeleteGroupPopUp 
+           onCancel={() => setIsDeletePopupOpen(false)} 
+           onConfirm={handleDeleteConfirm} 
+         />
       )}
     </div>
   );
