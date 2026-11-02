@@ -7,11 +7,21 @@ import { SelectButton } from "../components/SelectButton";
 import { Button } from "../components/Button";
 import { ChatList } from "../components/ChatList";
 
+import { CreateGroupPopUp } from "../components/CreateGroupPopUp";
+
 import ChatListMock from "../components/ChatListMock";
 
 function Home() {
   const navigate = useNavigate();
   const [chatType, setChatType] = useState("DIRECT");
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleCreateGroup = (groupName) => {
+    console.log("New group created:", groupName);
+    //TODO:
+    setIsPopupOpen(false);
+  };
 
   return (
     <div className="w-screen h-dvh overflow-hidden flex flex-col items-center">
@@ -59,7 +69,7 @@ function Home() {
           fullRound
           px="px-4"
           icon={<Plus size={18} />}
-          onClick={() => {}}
+          onClick={() => setIsPopupOpen(true)}
           hidden={chatType != "GROUP"}
           hideShadow
         >
@@ -81,6 +91,12 @@ function Home() {
           )}
         </div>
       </div>
+      {isPopupOpen && (
+        <CreateGroupPopUp
+          onCancel={() => setIsPopupOpen(false)} 
+          onConfirm={handleCreateGroup} 
+        />
+      )}
     </div>
   );
 }
