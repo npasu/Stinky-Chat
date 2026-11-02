@@ -58,6 +58,7 @@ export default function Chat() {
         <div className="w-full flex flex-col justify-start h-full">
           <ChatHeader
             conversationId={conversationId}
+            chatType={"GROUP"}
             toHome={() => navigate("/home")}
             onDeleteClick={() => setIsDeletePopupOpen(true)}
           />

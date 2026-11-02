@@ -2,7 +2,12 @@ import { ArrowLeft, Trash } from "lucide-react";
 
 import { Button } from "../Button";
 
-export function ChatHeader({ toHome, conversationId, onDeleteClick }) {
+export function ChatHeader({
+  toHome,
+  conversationId,
+  chatType,
+  onDeleteClick,
+}) {
   return (
     <div className="bg-blue w-full h-24 flex items-center px-24 justify-between">
       <div className="flex items-center gap-6">
@@ -17,16 +22,18 @@ export function ChatHeader({ toHome, conversationId, onDeleteClick }) {
         />
         <p className="text-h3 font-semibold">{conversationId}</p>
       </div>
-      <Button
-        color="orange"
-        px="px-4"
-        hideShadow={true}
-        className="text-button font-semibold"
-        onClick={onDeleteClick}
-        icon={<Trash size={24} strokeWidth={2} />}
-      >
-        Delete Group
-      </Button>
+      {chatType === "GROUP" && (
+        <Button
+          color="orange"
+          px="px-4"
+          hideShadow={true}
+          className="text-button font-semibold"
+          onClick={onDeleteClick}
+          icon={<Trash size={24} strokeWidth={2} />}
+        >
+          Delete Group
+        </Button>
+      )}
     </div>
   );
 }
