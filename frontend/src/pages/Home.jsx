@@ -45,7 +45,7 @@ function Home() {
       </div>
 
       {/* Main content */}
-      <div className="z-20 absolute  w-[94%] flex justify-between top-[12vw] px-[3vw]">
+      <div className="z-20 absolute  w-[90%] flex justify-between top-[12vw] px-[3vw]">
         <div className="flex gap-[2vw]">
           <SelectButton
             color={chatType === "DIRECT" ? "black" : "white"}
@@ -80,7 +80,7 @@ function Home() {
         </Button>
       </div>
       <div className="relative z-10 bg-white w-[94%] flex-1 min-h-0 -mt-[2px] overflow-y-auto overflow-x-hidden overscroll-contain">
-        <div className="p-4 flex flex-col gap-3">
+        <div className="py-4 px-18 flex flex-col gap-3">
           {ChatListMock.map(
             (option) =>
               option.type === chatType && (

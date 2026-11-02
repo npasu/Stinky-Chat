@@ -22,7 +22,7 @@ export function ChatList({
   return (
     <div
       {...props}
-      className={`${colorClass[currentColor]} w-full rounded-full flex items-center justify-between gap-2 px-6 py-4 text-button transition-colors cursor-pointer hover:brightness-90 ${className}`}
+      className={`${colorClass[currentColor]} w-full rounded-full flex items-center justify-between gap-2 px-14 py-4 text-button transition-colors cursor-pointer hover:brightness-90 ${className}`}
     >
       <div className="flex items-center gap-6 font-medium text-body">
         {profileIcon && <span>{profileIcon}</span>}
@@ -32,10 +32,10 @@ export function ChatList({
         {isGroup && (
           <button
             onClick={onMembersClick}
-            className="cursor-pointer hover:scale-110 transition-transform text-black"
+            className="cursor-pointer hover:scale-110 transition-transform text-black mr-4"
             title="View Members"
           >
-            <UsersRound size={36} strokeWidth={1} />
+            <UsersRound size={44} strokeWidth={1} />
           </button>
         )}
         <button
@@ -43,7 +43,7 @@ export function ChatList({
           className="cursor-pointer hover:scale-110 transition-transform text-black"
           title="Go to Chat"
         >
-          <MessageCircleMore size={36} strokeWidth={1} />
+          <MessageCircleMore size={44} strokeWidth={1} />
         </button>
       </div>
     </div>
