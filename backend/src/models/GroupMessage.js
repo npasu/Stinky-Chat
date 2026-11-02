@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 // Group Message Schema
 const groupMessageSchema = new mongoose.Schema(
     {
-        // Group's ID
-        groupId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Group',
-            required: true
+        // Group's name
+        groupName: {
+            type: String,
+            required: [true, 'Please add a group name'],
+            trim: true,
         },
 
         // Sender's Username

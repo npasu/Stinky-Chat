@@ -7,6 +7,7 @@ const GroupSchema = new mongoose.Schema(
         groupName: {
             type: String,
             required: [true, 'Please add a group name'],
+            unique: true,
             trim: true,
         },
 
