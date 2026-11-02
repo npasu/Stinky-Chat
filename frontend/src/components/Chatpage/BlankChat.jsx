@@ -14,7 +14,7 @@ export function BlankChat({ toHome, toEntry }) {
         onClick={toHome}
       >
         Back to home
-      </Button>{" "}
+      </Button>
       <Button
         color="yellow"
         py="py-6"

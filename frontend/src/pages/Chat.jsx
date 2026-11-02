@@ -16,6 +16,7 @@ export default function Chat() {
   const chatContainerRef = useRef(null);
 
   const [message, setMessage] = useState("");
+  const [user, setUser] = useState({ name: "user1" });
 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
@@ -45,10 +46,10 @@ export default function Chat() {
 
   const handleDeleteConfirm = () => {
     console.log("Deleting group:", conversationId);
-    // TODO: 
-    
-    setIsDeletePopupOpen(false); 
-    navigate("/home"); 
+    // TODO:
+
+    setIsDeletePopupOpen(false);
+    navigate("/home");
   };
 
   return (
@@ -64,13 +65,15 @@ export default function Chat() {
             ref={chatContainerRef}
             className="relative z-10 bg-white w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
           >
-            <div className="flex flex-col gap-3 px-24 py-4">
+            <div className="flex flex-col gap-8 px-24 pt-4 pb-8">
               {ChatMock.map((option) => (
                 <ChatBox
                   key={option.id}
                   isSender={option.isSender}
                   message={option.message}
-                  user={option.user}
+                  sender={option.user}
+                  user={user}
+                  reactions={option.reactions}
                 />
               ))}
             </div>
@@ -89,10 +92,10 @@ export default function Chat() {
         />
       )}
       {isDeletePopupOpen && (
-         <DeleteGroupPopUp 
-           onCancel={() => setIsDeletePopupOpen(false)} 
-           onConfirm={handleDeleteConfirm} 
-         />
+        <DeleteGroupPopUp
+          onCancel={() => setIsDeletePopupOpen(false)}
+          onConfirm={handleDeleteConfirm}
+        />
       )}
     </div>
   );
