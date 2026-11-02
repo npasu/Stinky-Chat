@@ -1,4 +1,4 @@
-import { MessageCircleMore } from "lucide-react";
+import { UsersRound, MessageCircleMore } from "lucide-react";
 
 export function ChatList({
   children,
@@ -7,6 +7,7 @@ export function ChatList({
   className = "",
   disabled = false,
   hideShadow = false,
+  isGroup = false,
   ...props
 }) {
   const colorClass = {
@@ -25,7 +26,10 @@ export function ChatList({
         {profileIcon && <span>{profileIcon}</span>}
         {name}
       </div>
-      <MessageCircleMore size={36} strokeWidth={1} />
+      <div className="flex items-center gap-4">
+        {isGroup && <UsersRound size={36} strokeWidth={1} />}
+        <MessageCircleMore size={36} strokeWidth={1} />
+      </div>
     </button>
   );
 }

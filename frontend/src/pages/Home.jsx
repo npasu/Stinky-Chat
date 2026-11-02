@@ -86,6 +86,7 @@ function Home() {
                   name={option.name}
                   profileIcon={<UserRoundGroup size={56} strokeWidth={1} />}
                   onClick={() => navigate(`/chat/${option.id}`)}
+                  isGroup={option.type === "GROUP"}
                 />
               ),
           )}
