@@ -1,9 +1,4 @@
-import {
-  FaceSlightlySmilingPlus,
-  Heart,
-  ThumbsDown,
-  ThumbsUp,
-} from "lucide-react";
+import { FaceSlightlySmiling, Heart, ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "../Button";
 
 export function ChatBox({ isSender, message, reactions, user, sender }) {
@@ -59,24 +54,12 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
       >
         {/* Emote box */}
 
-        <div className={`${alignment} absolute -bottom-5 flex w-fit ms-6`}>
-          {/* If want Button */}
-
-          {/* <Button
-            fullRound={true}
-            px="px-0"
-            py="py-0"
-            color="yellow"
-            hideShadow={true}
-            onClick={() => {}}
-            className={`${alignment} h-8 aspect-square border-white border-1 z-10 -mr-1.5`}
-            icon={<FaceSlightlySmilingPlus size={18} strokeWidth={2.5} />}
-          /> */}
-
-          <div className="h-8 aspect-square bg-primary-yellow rounded-full z-10 -mr-1.5 flex items-center justify-center border-white border-1">
-            <FaceSlightlySmilingPlus size={18} strokeWidth={2.5} />
-          </div>
+        <div className={`${alignment} absolute -bottom-6 flex w-fit ms-6`}>
           <div className="bg-primary-yellow flex items-center justify-center min-h-8 px-2 border-white border-1 rounded-full gap-2">
+            <div className="flex items-center gap-1">
+              <FaceSlightlySmiling size={18} strokeWidth={2.5} />
+              <p className="font-semibold">|</p>
+            </div>
             {Object.entries(reactionIcon).map(([key, renderIcon]) => {
               const users = reactions[key] ?? [];
               const isActive = users.includes(user.name);
