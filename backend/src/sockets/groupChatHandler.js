@@ -1,18 +1,38 @@
 import GroupMessage from '../models/GroupMessage.js';
 import { toggleEmojiReaction } from '../utils/reactionHelper.js';
-
+import {
+    SocketError,
+    SOCKET_ERROR_CODES,
+    handleSocketError,
+} from '../utils/socketError.js';
 
 export const handleGroupChatEvents = (io, socket) => {
 
     // Send a message into the group
     socket.on('group:send_message', async ({
-        groupName, senderName, text
-    }) => {
+        groupName, text
+    } = {}) => {
         try {
+            const username = socket.user?.username;
+            if (!username) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.UNAUTHORIZED,
+                    'Authentication required'
+                );
+            }
+
+            // Validate input
+            if (!groupName || !text?.trim()) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'Group name and message text are required'
+                );
+            }
+
             // Create a new message in database
             const newMessage = await GroupMessage.create({
                 groupName,
-                senderName,
+                senderName: username,
                 text,
                 reactions: {},
             });
@@ -20,19 +40,27 @@ export const handleGroupChatEvents = (io, socket) => {
             // Send the message to everyone in the group
             io.to(groupName).emit('group:message_received', newMessage);
         } catch (error) {
-            socket.emit('group:error', {
-                message: 'Failed to send message',
-                error: error.message,
-            });
+            handleSocketError(socket, 'group:error', error);
         }
     });
 
     // Get chat history
     socket.on('group:get_history', async ({
         groupName, limit = 50,
-    }) => {
+    } = {}) => {
         try {
-            const fetchLimit = Math.min(Number(limit) || 50, 100);
+            // Validate input
+            if (!groupName) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'Group name is required'
+                );
+            }
+
+            const fetchLimit = Math.min(
+                Math.max(Number(limit) || 50, 1),
+                100
+            );
 
             // Get history
             const history = await GroupMessage
@@ -49,23 +77,29 @@ export const handleGroupChatEvents = (io, socket) => {
                 history: sortedHistory,
             });
         } catch (error) {
-            socket.emit('group:error', {
-                message: 'Failed to load history',
-                error: error.message,
-            });
+            handleSocketError(socket, 'group:error', error);
         }
     });
 
     // Toggle emoji reactions on a message
     socket.on('group:react', async ({
         messageId, groupName, emoji,
-    }) => {
+    } = {}) => {
         try {
-            const username = socket.user.username;
+            const username = socket.user?.username;
+            if (!username) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.UNAUTHORIZED,
+                    'Authentication required'
+                );
+            }
 
             // Validate input
             if (!messageId || !groupName || !emoji) {
-                throw new Error('Missing required fields');
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'Message ID, group name, and emoji are required'
+                );
             }
 
             // Update reactions using helper
@@ -82,10 +116,7 @@ export const handleGroupChatEvents = (io, socket) => {
                 reactions: updatedReactions,
             });
         } catch (error) {
-            socket.emit('group:error', {
-                message: 'Failed to update reaction',
-                error: error.message,
-            });
+            handleSocketError(socket, 'group:error', error);
         }
     });
 };
