@@ -23,19 +23,34 @@ A real-time chat application developed for the **Computer Network** course, focu
 ## 📁 Repository Structure
 
 ```text
-/
-├── backend/          # Node.js + Express + Socket.IO Server
+.
+├── .github/
+│   └── workflows/
+│       └── backend-ci.yml        # CI Pipeline (Syntax check, ESM validation, Audit)
+│
+├── backend/                      # Node.js + Express + Socket.IO Server
 │   ├── src/
-│   │   ├── config/   # Environment variables & DB connection
-│   │   ├── models/   # Mongoose Schemas (User, Group, Message)
-│   │   ├── sockets/  # Socket.IO Event Handlers
-│   │   └── server.js # Main Entry Point
-│   ├── package.json
+│   │   ├── config/
+│   │   │   └── db.js             # MongoDB Atlas connection & DNS configuration
+│   │   ├── models/
+│   │   │   ├── User.js           # User schema & online status
+│   │   │   ├── Group.js          # Group management & leader info schema
+│   │   │   ├── GroupMessage.js   # Group messages & emoji reaction map schema
+│   │   │   └── PrivateMessage.js # Private messages & reaction schema
+│   │   ├── sockets/
+│   │   │   ├── index.js          # Socket connection dispatcher
+│   │   │   ├── userHandler.js    # User registration & online status events
+│   │   │   ├── groupHandler.js   # Group creation & leader-only deletion events
+│   │   │   └── chatHandler.js    # Messaging, chat history & reaction events
+│   │   └── server.js             # Application entry point & server setup
+│   ├── .env.example              # Environment variables template (MONGO_URI, PORT)
+│   ├── package.json              # Backend dependencies & ESM configuration ("type": "module")
 │   └── README.md
 │
-└── frontend/         # React + Vite + Tailwind CSS Client
+└── frontend/                     # React + Vite + Tailwind CSS Client
+    ├── public/
     ├── src/
-    ├── package.json
+    ├── package.json              # Frontend dependencies
     └── README.md
 ```
 

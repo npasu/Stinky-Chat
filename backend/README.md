@@ -9,20 +9,24 @@ Backend server for the Computer Network Term Project built with **Node.js**, **E
 ```text
 backend/
 ├── src/
-│   ├── config/          # Configuration files & database setup
-│   │   ├── .env         # Local environment variables (do not commit)
-│   │   ├── .env.example # Example template for environment keys
-│   │   └── db.js        # MongoDB connection setup via Mongoose
-│   ├── models/          # Mongoose Schemas (User, Group, Message)
-│   │   ├── User.js
-│   │   ├── Group.js
-│   │   └── Message.js
-│   ├── sockets/         # Socket.IO event handlers
-│   └── server.js        # Main entry point (Express + Socket.IO)
-├── package-lock.json
-├── package.json         # Project metadata, dependencies, and scripts
-└── README.md            # Backend documentation
-
+│   ├── config/               # Database connection & environment configuration
+│   │   ├── .env              # Local environment variables (do NOT commit to Git)
+│   │   ├── .env.example      # Template for required environment variables
+│   │   └── db.js             # MongoDB connection setup with Google DNS fix
+│   ├── models/               # Mongoose Data Schemas
+│   │   ├── User.js           # User profile & online status schema
+│   │   ├── Group.js          # Group details & leader info schema
+│   │   ├── GroupMessage.js   # Group messages & emoji reactions schema
+│   │   └── PrivateMessage.js # Direct messages & reactions schema
+│   ├── sockets/              # Socket.IO Event Handlers (Modular architecture)
+│   │   ├── index.js          # Central socket dispatcher
+│   │   ├── userHandler.js    # User registration & online list events
+│   │   ├── groupHandler.js   # Group creation & leader-only deletion events
+│   │   └── chatHandler.js    # Messaging, history fetching & reaction events
+│   └── server.js             # Main application entry point (Express + Socket.IO)
+├── package-lock.json         # Dependency lockfile (Required for GitHub Actions CI)
+├── package.json              # ES Modules configuration ("type": "module"), scripts & dependencies
+└── README.md                 # Backend project documentation
 ```
 
 ---
