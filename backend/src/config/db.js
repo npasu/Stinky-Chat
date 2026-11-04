@@ -1,13 +1,18 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const connectDB = async () => {
-    mongoose.set('strictQuery', true);
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-        // Add database name to connection string
-        dbName: 'chat-app',
-    });
+    try {
+        mongoose.set('strictQuery', true);
+        const conn = await mongoose.connect(process.env.MONGO_URI, {
+            // Add database name to connection string
+            dbName: 'chat-app',
+        });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.error(`MongoDB Connection Error: ${error.message}`);
+        process.exit(1);
+    }
 };
 
-module.exports = connectDB;
+export default connectDB;
