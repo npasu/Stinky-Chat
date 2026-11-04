@@ -23,35 +23,44 @@ A real-time chat application developed for the **Computer Network** course, focu
 ## 📁 Repository Structure
 
 ```text
-.
+Stinky-Chat/
 ├── .github/
 │   └── workflows/
-│       └── backend-ci.yml        # CI Pipeline (Syntax check, ESM validation, Audit)
+│       └── backend-ci.yml        # Backend CI Pipeline (Syntax Check, ESM Import Validation, Security Audit)
 │
 ├── backend/                      # Node.js + Express + Socket.IO Server
 │   ├── src/
-│   │   ├── config/
-│   │   │   └── db.js             # MongoDB Atlas connection & DNS configuration
-│   │   ├── models/
-│   │   │   ├── User.js           # User schema & online status
-│   │   │   ├── Group.js          # Group management & leader info schema
-│   │   │   ├── GroupMessage.js   # Group messages & emoji reaction map schema
-│   │   │   └── PrivateMessage.js # Private messages & reaction schema
-│   │   ├── sockets/
-│   │   │   ├── index.js          # Socket connection dispatcher
-│   │   │   ├── userHandler.js    # User registration & online status events
+│   │   ├── config/               # Database connection & environment configuration
+│   │   │   ├── .env              # Local environment variables (do NOT commit to Git)
+│   │   │   ├── .env.example      # Template for required environment variables
+│   │   │   └── db.js             # MongoDB connection setup with Google DNS fix
+│   │   │
+│   │   ├── models/               # Mongoose Data Schemas
+│   │   │   ├── User.js           # User profile & online status schema
+│   │   │   ├── Group.js          # Group details & leader info schema
+│   │   │   ├── GroupMessage.js   # Group messages & emoji reactions schema
+│   │   │   └── PrivateMessage.js # Direct messages & reaction schema
+│   │   │
+│   │   ├── sockets/              # Socket.IO Event Handlers (Modular architecture)
+│   │   │   ├── index.js          # Central socket dispatcher
+│   │   │   ├── userHandler.js    # User registration & online list events
 │   │   │   ├── groupHandler.js   # Group creation & leader-only deletion events
 │   │   │   └── chatHandler.js    # Messaging, chat history & reaction events
-│   │   └── server.js             # Application entry point & server setup
-│   ├── .env.example              # Environment variables template (MONGO_URI, PORT)
-│   ├── package.json              # Backend dependencies & ESM configuration ("type": "module")
-│   └── README.md
+│   │   │
+│   │   ├── app.js                # Express application & Socket.IO configuration
+│   │   └── server.js             # Application entry point (Database connection & HTTP server startup)
+│   │
+│   ├── package-lock.json         # Dependency lockfile (Required for GitHub Actions CI)
+│   ├── package.json              # ES Modules configuration ("type": "module"), scripts & dependencies
+│   └── README.md                 # Backend project documentation
 │
-└── frontend/                     # React + Vite + Tailwind CSS Client
-    ├── public/
-    ├── src/
-    ├── package.json              # Frontend dependencies
-    └── README.md
+├── frontend/                     # React + Vite + Tailwind CSS Client
+│   ├── public/
+│   ├── src/
+│   ├── package.json              # Frontend dependencies
+│   └── README.md                 # Frontend project documentation
+│
+└── README.md                     # Main project documentation
 ```
 
 ---

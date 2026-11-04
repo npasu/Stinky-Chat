@@ -39,9 +39,7 @@ jobs:
           find src -name "*.js" -print0 | xargs -0 -n1 node --check
 
       - name: Validate ESM Imports
-        run: node --input-type=module -e "import('./src/server.js')"
-        env:
-          PORT: 5000
+        run: node --input-type=module -e "await import('./src/app.js')"
 
       - name: Security Audit (Packages)
         run: npm audit --audit-level=high --omit=dev
