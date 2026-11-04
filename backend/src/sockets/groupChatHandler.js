@@ -7,20 +7,13 @@ import {
 } from '../utils/socketError.js';
 
 export const handleGroupChatEvents = (io, socket) => {
+    const { username } = socket.user;
 
     // Send a message into the group
     socket.on('group:send_message', async ({
         groupName, text
     } = {}) => {
         try {
-            const username = socket.user?.username;
-            if (!username) {
-                throw new SocketError(
-                    SOCKET_ERROR_CODES.UNAUTHORIZED,
-                    'Authentication required'
-                );
-            }
-
             // Validate input
             if (!groupName || !text?.trim()) {
                 throw new SocketError(
@@ -86,14 +79,6 @@ export const handleGroupChatEvents = (io, socket) => {
         messageId, groupName, emoji,
     } = {}) => {
         try {
-            const username = socket.user?.username;
-            if (!username) {
-                throw new SocketError(
-                    SOCKET_ERROR_CODES.UNAUTHORIZED,
-                    'Authentication required'
-                );
-            }
-
             // Validate input
             if (!messageId || !groupName || !emoji) {
                 throw new SocketError(

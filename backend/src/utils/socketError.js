@@ -4,6 +4,7 @@ export const SOCKET_ERROR_CODES = {
     FORBIDDEN: 'FORBIDDEN',
     NOT_FOUND: 'NOT_FOUND',
     INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+    CONFLICT: 'CONFLICT',
 };
 
 export class SocketError extends Error {
