@@ -23,7 +23,8 @@ backend/
 │   │   ├── userHandler.js    # User registration & online list events
 │   │   ├── groupHandler.js   # Group creation & leader-only deletion events
 │   │   └── chatHandler.js    # Messaging, history fetching & reaction events
-│   └── server.js             # Main application entry point (Express + Socket.IO)
+│   ├── app.js                # Express application & Socket.IO configuration
+│   └── server.js             # Application entry point (Database connection & HTTP server startup)
 ├── package-lock.json         # Dependency lockfile (Required for GitHub Actions CI)
 ├── package.json              # ES Modules configuration ("type": "module"), scripts & dependencies
 └── README.md                 # Backend project documentation
