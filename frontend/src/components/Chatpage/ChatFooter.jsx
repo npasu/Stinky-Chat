@@ -8,6 +8,7 @@ export function ChatFooter({
   onMessageChange,
   onSendMessage,
   onRecord,
+  isRecording,
 }) {
   return (
     <div className="bg-blue w-full h-24 flex items-center px-24 gap-6 justify-center">
@@ -22,10 +23,10 @@ export function ChatFooter({
         fullRound={true}
         px="px-0"
         py="py-0"
-        color="yellow"
+        color={isRecording ? "orange" : "yellow"}
         hideShadow={true}
         onClick={onRecord}
-        className="h-10 aspect-square"
+        className={`h-10 aspect-square ${isRecording ? 'animate-pulse' : ''}`}
         icon={<Mic size={20} strokeWidth={2} />}
       />
       <Button
