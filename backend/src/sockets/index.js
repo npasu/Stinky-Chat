@@ -14,16 +14,7 @@ export const setupSocketEvents = (io) => {
         handleGroupChatEvents(io, socket);
 
         socket.on('disconnect', async () => {
-            try {
-                await User.deleteOne({
-                    _id: socket.user._id,
-                    socketId: socket.id,
-                });
-
-                console.log(`Client disconnected: ${socket.id}`);
-            } catch (error) {
-                console.error('Failed to remove disconnected user:', error);
-            }
+            await handleUserDisconnect(io, socket);
         });
     });
 }

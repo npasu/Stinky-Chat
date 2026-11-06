@@ -105,3 +105,10 @@ export const handleGroupChatEvents = (io, socket) => {
         }
     });
 };
+
+export const anonymizeUserMessages = async (username) => {
+    await GroupMessage.updateMany(
+        { senderName: username },
+        { $set: { senderName: 'Anonymous' } }
+    );
+};

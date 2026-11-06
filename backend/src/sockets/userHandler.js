@@ -1,78 +1,80 @@
 import User from "../models/User.js";
 import {
-  SocketError,
-  SOCKET_ERROR_CODES,
-  handleSocketError,
+    SocketError,
+    SOCKET_ERROR_CODES,
+    handleSocketError,
 } from "../utils/socketError.js";
 
 export const handleUserEvents = (io, socket) => {
-  const { username } = socket.user;
+    const { username } = socket.user;
 
-  // Get current user's profile
-  socket.on("user:get_profile", async () => {
-    try {
-      const user = await User.findById(socket.user._id);
+    // Get current user's profile
+    socket.on("user:get_profile", async () => {
+        try {
+            const user = await User.findById(socket.user._id);
 
-      if (!user) {
-        throw new SocketError(SOCKET_ERROR_CODES.NOT_FOUND, "User not found");
-      }
+            if (!user) {
+                throw new SocketError(SOCKET_ERROR_CODES.NOT_FOUND, "User not found");
+            }
 
-      console.log("User Profile:", user);
+            console.log("User Profile:", user);
 
-      // Send profile back to the requesting user
-      socket.emit("user:profile_loaded", user);
-    } catch (error) {
-      handleSocketError(socket, "user:error", error);
-    }
-  });
+            // Send profile back to the requesting user
+            socket.emit("user:profile_loaded", user);
+        } catch (error) {
+            handleSocketError(socket, "user:error", error);
+        }
+    });
 
-  // Notify everyone that this user is online
-  io.emit("user:online", {
-    username,
-  });
-
-  // Get all online users
-  socket.on("user:get_online_users", async () => {
-    try {
-      const users = await User.find({
-        socketId: {
-          $exists: true,
-          $nin: [null, ""],
-        },
-      })
-        .sort({ username: 1 });
-
-      console.log("Online users:", users);
-
-      socket.emit("user:online_users_loaded", users);
-    } catch (error) {
-      handleSocketError(socket, "user:error", error);
-    }
-  });
-
-  // Handle user disconnection
-  socket.on("disconnect", async () => {
-    try {
-      const user = await User.findById(socket.user._id);
-
-      if (!user) {
-        console.log(`User not found: ${username}`);
-        return;
-      }
-
-      // Delete user from database
-      await User.deleteOne({
-        _id: socket.user._id,
-      });
-
-      console.log(`User disconnected: ${username}`);
-
-      // Notify everyone that this user went offline
-      io.emit("user:offline", {
+    // Notify everyone that this user is online
+    io.emit("user:online", {
         username,
-      });
+    });
+
+    // Get all online users
+    socket.on("user:get_online_users", async () => {
+        try {
+            const users = await User.find({
+                socketId: {
+                    $exists: true,
+                    $nin: [null, ""],
+                },
+            })
+                .sort({ username: 1 });
+
+            console.log("Online users:", users);
+
+            socket.emit("user:online_users_loaded", users);
+        } catch (error) {
+            handleSocketError(socket, "user:error", error);
+        }
+    });
+};
+
+export const handleUserDisconnect = async (io, socket) => {
+    try {
+        const username = socket.user?.username;
+
+        if (!socket.user?._id) return;
+
+        // Leave group
+        // await leaveGroup(username);
+
+        // Delete private chat
+        // await deletePrivateChat(username);
+
+        // Delete user from database
+        await User.deleteOne({
+            _id: socket.user._id,
+            socketId: socket.id,
+        });
+
+        console.log(`User disconnected: ${username}`);
+
+        // Notify everyone that this user went offline
+        io.emit('user:offline', { username });
+
     } catch (error) {
-      console.error("User disconnect error:", error);
+        console.error('User disconnect error:', error);
     }
-  });
 };
