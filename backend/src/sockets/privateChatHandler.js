@@ -36,10 +36,18 @@ export const handlePrivateChatEvents = (io, socket) => {
                 username: receiverName,
             });
 
-            if (typeof receiverName !== 'string' || !receiverName.trim()) {
+            if (!receiver) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.NOT_FOUND,
                     'Receiver is not online'
+                );
+            }
+
+            // Cannot send to yourself
+            if (receiverName.trim() === username) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'You cannot send a message to yourself'
                 );
             }
 
@@ -70,7 +78,7 @@ export const handlePrivateChatEvents = (io, socket) => {
     } = {}) => {
         try {
             // Validate input
-            if (!receiverName) {
+            if (typeof receiverName !== 'string' || !receiverName.trim()) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
                     'receiverName is required'
@@ -140,6 +148,14 @@ export const handlePrivateChatEvents = (io, socket) => {
                     SOCKET_ERROR_CODES.FORBIDDEN,
                     'You cannot react to this message'
                 );                
+            }
+
+            // Cannot react to own message (?)
+            if (message.senderName === username) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.FORBIDDEN,
+                    'You cannot react to your own message'
+                );
             }
                 
             // Update reactions using helper
