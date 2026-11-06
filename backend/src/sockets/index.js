@@ -1,5 +1,4 @@
-import User from '../models/User.js';
-import { handleUserEvents } from './userHandler.js';
+import { handleUserEvents, handleUserDisconnect } from './userHandler.js';
 import { handleGroupEvents } from './groupHandler.js';
 import { handlePrivateChatEvents } from './privateChatHandler.js';
 import { handleGroupChatEvents } from './groupChatHandler.js';

@@ -4,6 +4,7 @@ import {
     SOCKET_ERROR_CODES,
     handleSocketError,
 } from "../utils/socketError.js";
+import { leaveGroups } from "./groupHandler.js";
 
 export const handleUserEvents = (io, socket) => {
     const { username } = socket.user;
@@ -34,15 +35,10 @@ export const handleUserEvents = (io, socket) => {
     // Get all online users
     socket.on("user:get_online_users", async () => {
         try {
-            const users = await User.find({
-                socketId: {
-                    $exists: true,
-                    $nin: [null, ""],
-                },
-            })
+            const users = await User.find()
                 .sort({ username: 1 });
 
-            console.log("Online users:", users);
+            console.log("Online users: ", users);
 
             socket.emit("user:online_users_loaded", users);
         } catch (error) {
@@ -58,7 +54,7 @@ export const handleUserDisconnect = async (io, socket) => {
         if (!socket.user?._id) return;
 
         // Leave group
-        // await leaveGroup(username);
+        await leaveGroups(io, socket, username);
 
         // Delete private chat
         // await deletePrivateChat(username);

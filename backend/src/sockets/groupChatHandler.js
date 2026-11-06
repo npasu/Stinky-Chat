@@ -112,3 +112,7 @@ export const anonymizeUserMessages = async (username) => {
         { $set: { senderName: 'Anonymous' } }
     );
 };
+
+export const deleteGroupMessages = async (groupName) => {
+    await GroupMessage.deleteMany({ groupName });
+};
