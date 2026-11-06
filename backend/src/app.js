@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import { socketAuth } from './middlewares/socketAuth.js';
 
 import { setupSocketEvents } from './sockets/index.js';
 
@@ -23,6 +24,10 @@ const io = new Server(server, {
     },
 });
 
+// Socket authentication middleware
+io.use(socketAuth);
+
+// Register socket events
 setupSocketEvents(io);
 
 export { app, server, io };
