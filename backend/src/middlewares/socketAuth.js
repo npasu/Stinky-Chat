@@ -1,22 +1,56 @@
-import dotenv from 'dotenv';
-import connectDB from './config/db.js';
-import { server } from './app.js';
+import User from '../models/User.js';
+import {
+    SOCKET_ERROR_CODES,
+} from '../utils/socketError.js';
 
-dotenv.config({ path: './src/config/.env' });
-
-const PORT = process.env.PORT || 5000;
-
-const startServer = async () => {
+export const socketAuth = async (socket, next) => {
     try {
-        await connectDB();
+        // Get username from client handshake
+        const username = (socket.handshake.auth?.username || socket.handshake.headers?.username)?.trim();
 
-        server.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+        // Validate username
+        if (!username) {
+            const error = new Error('Username is required');
+            error.data = {
+                code: SOCKET_ERROR_CODES.BAD_REQUEST,
+            };
+
+            return next(error);
+        }
+
+        // Create user in database
+        const user = await User.create({
+            username,
+            socketId: socket.id,
         });
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
-    }
-};
 
-startServer();
+        // Attach user information to socket
+        socket.user = user;
+
+        next();
+    } catch (error) {
+        // Handle duplicate username
+        if (error.code === 11000) {
+            const authError = new Error(
+                'Username is already in use'
+            );
+
+            authError.data = {
+                code: SOCKET_ERROR_CODES.CONFLICT,
+            };
+
+            return next(authError);
+        }
+
+        // Handle unexpected errors
+        const authError = new Error(
+            'Authentication failed'
+        );
+
+        authError.data = {
+            code: SOCKET_ERROR_CODES.INTERNAL_SERVER_ERROR,
+        };
+
+        next(authError);
+    }
+}

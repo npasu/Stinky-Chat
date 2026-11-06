@@ -7,7 +7,7 @@ import {
     handleSocketError,
 } from '../utils/socketError.js';
 
-// Create socket // TODO: สร้างห้องให้เสร็จ + test
+// Create private room name
 const getPrivateRoomName = (senderName, receiverName) => {
     const names = [senderName, receiverName].sort();
 
@@ -42,6 +42,12 @@ export const handlePrivateChatEvents = (io, socket) => {
                 );
             }
 
+            // Join the private room
+            const privateRoomName = getPrivateRoomName(username, receiver.username);
+
+            await socket.join(privateRoomName);
+            await io.in(receiver.socketId).socketsJoin(privateRoomName);
+
             // Create a new message in database
             const newMessage = await PrivateMessage.create({
                 receiverName,
@@ -51,7 +57,7 @@ export const handlePrivateChatEvents = (io, socket) => {
             });
 
             // Send the message to receiver
-            io.to([socket.id, receiver.socketId]).emit('private:message_received', newMessage);
+            io.to(privateRoomName).emit('private:message_received', newMessage);
         } catch (error) {
             handleSocketError(socket, 'private:error', error);
         }
@@ -69,6 +75,11 @@ export const handlePrivateChatEvents = (io, socket) => {
                     'receiverName is required'
                 );
             }
+
+            // Join the room
+            const privateRoomName = getPrivateRoomName(username, receiverName);
+
+            await socket.join(privateRoomName);
 
             const fetchLimit = Math.min(
                Math.max(Number(limit) || 50, 1),
@@ -147,8 +158,14 @@ export const handlePrivateChatEvents = (io, socket) => {
 
             const socketIds = users.map((user) => user.socketId);
 
+            // Specify room name to send reaction
+            const privateRoomName = getPrivateRoomName(message.senderName,message.receiverName);
+
+            await socket.join(privateRoomName);
+            await io.in(socketIds).socketsJoin(privateRoomName);
+
             // Broadcast the updated reactions message to both side
-            io.to([socket.id, ...socketIds]).emit('private:reaction_updated', {
+            io.to(privateRoomName).emit('private:reaction_updated', {
                 messageId: message._id,
                 reactions: Object.fromEntries(updatedReactions)
             });
