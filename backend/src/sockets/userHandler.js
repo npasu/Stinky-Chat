@@ -5,6 +5,7 @@ import {
     handleSocketError,
 } from "../utils/socketError.js";
 import { leaveGroups } from "./groupHandler.js";
+import { deletePrivateChat } from "./privateChatHandler.js";
 
 export const handleUserEvents = (io, socket) => {
     const { username } = socket.user;
@@ -57,7 +58,7 @@ export const handleUserDisconnect = async (io, socket) => {
         await leaveGroups(io, socket, username);
 
         // Delete private chat
-        // await deletePrivateChat(username);
+        await deletePrivateChat(username);
 
         // Delete user from database
         await User.deleteOne({

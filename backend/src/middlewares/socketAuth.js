@@ -15,6 +15,13 @@ export const socketAuth = async (socket, next) => {
             return next(error);
         }
 
+        // No anonymous as username
+        if (username.toLowerCase() === 'anonymous') {
+            const error = new Error('This username is not allowed');
+            error.data = { code: SOCKET_ERROR_CODES.BAD_REQUEST };
+            return next(error);
+        }
+
         // Get avatar id (auth keeps its type, header is always a string)
         const rawAvatarId = auth?.avatarId ?? headers?.avatarid;
 
