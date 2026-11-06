@@ -6,7 +6,6 @@ import {
     SOCKET_ERROR_CODES,
     handleSocketError,
 } from '../utils/socketError.js';
-import mongoose from 'mongoose';
 
 export const handlePrivateChatEvents = (io, socket) => {
     const { username } = socket.user;
@@ -17,10 +16,18 @@ export const handlePrivateChatEvents = (io, socket) => {
     } = {}) => {
         try {
             // Validate input
-            if ( typeof receiverName !== 'string' || !receiverName.trim() || typeof text !== 'string' || !text?.trim() ) {
+            if (!receiverName || !text?.trim()) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
                     'receiver name and message text are required'
+                );
+            }
+
+            // Cannot send to yourself
+            if (receiverName.trim() === username) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'You cannot send a message to yourself'
                 );
             }
 
@@ -33,14 +40,6 @@ export const handlePrivateChatEvents = (io, socket) => {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.NOT_FOUND,
                     'Receiver is not online'
-                );
-            }
-
-            // Cannot send to yourself
-            if (receiverName.trim() === username) {
-                throw new SocketError(
-                    SOCKET_ERROR_CODES.BAD_REQUEST,
-                    'You cannot send a message to yourself'
                 );
             }
 
@@ -65,7 +64,7 @@ export const handlePrivateChatEvents = (io, socket) => {
     } = {}) => {
         try {
             // Validate input
-            if (typeof receiverName !== 'string' || !receiverName.trim()) {
+            if (!receiverName) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
                     'receiverName is required'
@@ -73,18 +72,18 @@ export const handlePrivateChatEvents = (io, socket) => {
             }
 
             const fetchLimit = Math.min(
-               Math.max(Number(limit) || 50, 1),
-               100 
+                Math.max(Number(limit) || 50, 1),
+                100
             );
 
             // Get history
             const history = await PrivateMessage
-                .find({ 
+                .find({
                     $or: [
                         { senderName: username, receiverName }, // A -> B
                         { senderName: receiverName, receiverName: username }, // B -> A
                     ]
-                 })
+                })
                 .sort({ createdAt: -1 })
                 .limit(fetchLimit);
 
@@ -107,7 +106,7 @@ export const handlePrivateChatEvents = (io, socket) => {
     } = {}) => {
         try {
             // Validate input
-            if ( !mongoose.isObjectIdOrHexString(messageId) || typeof emoji !== 'string' || !emoji.trim()) {
+            if (!messageId || !emoji) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
                     'Valid Message ID and emoji are required'
@@ -116,8 +115,7 @@ export const handlePrivateChatEvents = (io, socket) => {
 
             // Find message
             const message = await PrivateMessage.findById(messageId);
-
-            if ( !message ) {
+            if (!message) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.NOT_FOUND,
                     'Message not found'
@@ -125,13 +123,13 @@ export const handlePrivateChatEvents = (io, socket) => {
             }
 
             // Only sender and receiver can react
-            if ( message.senderName !== username && message.receiverName !== username ) {
+            if (message.senderName !== username && message.receiverName !== username) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.FORBIDDEN,
                     'You cannot react to this message'
-                );                
+                );
             }
-                
+
             // Update reactions using helper
             const updatedReactions = await toggleEmojiReaction(
                 PrivateMessage,
@@ -157,5 +155,16 @@ export const handlePrivateChatEvents = (io, socket) => {
         } catch (error) {
             handleSocketError(socket, 'private:error', error);
         }
+    });
+};
+
+export const deletePrivateChat = async (username) => {
+    if (!username) return;
+
+    await PrivateMessage.deleteMany({
+        $or: [
+            { senderName: username },
+            { receiverName: username },
+        ],
     });
 };

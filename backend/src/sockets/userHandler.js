@@ -57,7 +57,7 @@ export const handleUserDisconnect = async (io, socket) => {
         await leaveGroups(io, socket, username);
 
         // Delete private chat
-        // await deletePrivateChat(username);
+        await deletePrivateChat(username);
 
         // Delete user from database
         await User.deleteOne({

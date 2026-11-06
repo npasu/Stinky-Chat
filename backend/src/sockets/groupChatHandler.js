@@ -1,4 +1,5 @@
 import GroupMessage from '../models/GroupMessage.js';
+import Group from '../models/Group.js';
 import { toggleEmojiReaction } from '../utils/reactionHelper.js';
 import {
     SocketError,
@@ -84,6 +85,38 @@ export const handleGroupChatEvents = (io, socket) => {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
                     'Message ID, group name, and emoji are required'
+                );
+            }
+
+            // Find message
+            const message = await GroupMessage.findById(messageId);
+            if (!message) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.NOT_FOUND,
+                    'Message not found'
+                );
+            }
+
+            // Find group of the message
+            const group = await Group.findOne({ groupName: groupName });
+            if (!group) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.NOT_FOUND,
+                    'Group not found'
+                );
+            }
+            if (message.groupName !== groupName) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'Message does not belong to this group'
+                );
+            }
+
+            // Validate membership
+            if (!group.members.includes(username)) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.FORBIDDEN,
+                    'You cannot react to this message'
                 );
             }
 
