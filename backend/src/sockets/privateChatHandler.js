@@ -6,6 +6,7 @@ import {
     SOCKET_ERROR_CODES,
     handleSocketError,
 } from '../utils/socketError.js';
+import mongoose from 'mongoose';
 
 // Create private room name
 const getPrivateRoomName = (senderName, receiverName) => {
@@ -23,7 +24,7 @@ export const handlePrivateChatEvents = (io, socket) => {
     } = {}) => {
         try {
             // Validate input
-            if ( !receiverName || !text?.trim() ) {
+            if ( typeof receiverName !== 'string' || !receiverName.trim() || typeof text !== 'string' || !text?.trim() ) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
                     'receiver name and message text are required'
@@ -35,7 +36,7 @@ export const handlePrivateChatEvents = (io, socket) => {
                 username: receiverName,
             });
 
-            if (!receiver) {
+            if (typeof receiverName !== 'string' || !receiverName.trim()) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.NOT_FOUND,
                     'Receiver is not online'
@@ -116,10 +117,10 @@ export const handlePrivateChatEvents = (io, socket) => {
     } = {}) => {
         try {
             // Validate input
-            if ( !messageId || !emoji) {
+            if ( !mongoose.isObjectIdOrHexString(messageId) || typeof emoji !== 'string' || !emoji.trim()) {
                 throw new SocketError(
                     SOCKET_ERROR_CODES.BAD_REQUEST,
-                    'Message ID and emoji are required'
+                    'Valid Message ID and emoji are required'
                 );
             }
 
