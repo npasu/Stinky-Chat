@@ -71,6 +71,14 @@ export const handlePrivateChatEvents = (io, socket) => {
                 );
             }
 
+            // Cannot get history of yourself
+            if (receiverName.trim() === username) {
+                throw new SocketError(
+                    SOCKET_ERROR_CODES.BAD_REQUEST,
+                    'Cannot get history of yourself'
+                );
+            }
+
             const fetchLimit = Math.min(
                 Math.max(Number(limit) || 50, 1),
                 100
@@ -87,7 +95,7 @@ export const handlePrivateChatEvents = (io, socket) => {
                 .sort({ createdAt: -1 })
                 .limit(fetchLimit);
 
-            //Flip the array
+            // Flip the array
             const sortedHistory = history.reverse();
 
             // Send the history back

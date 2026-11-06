@@ -5,6 +5,7 @@ import {
     handleSocketError,
 } from "../utils/socketError.js";
 import { leaveGroups } from "./groupHandler.js";
+import { deletePrivateChat } from "./privateChatHandler.js";
 
 export const handleUserEvents = (io, socket) => {
     const { username } = socket.user;
