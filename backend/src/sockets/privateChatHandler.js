@@ -149,14 +149,6 @@ export const handlePrivateChatEvents = (io, socket) => {
                     'You cannot react to this message'
                 );                
             }
-
-            // Cannot react to own message (?)
-            if (message.senderName === username) {
-                throw new SocketError(
-                    SOCKET_ERROR_CODES.FORBIDDEN,
-                    'You cannot react to your own message'
-                );
-            }
                 
             // Update reactions using helper
             const updatedReactions = await toggleEmojiReaction(
