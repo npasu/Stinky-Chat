@@ -4,22 +4,24 @@ import {
     SOCKET_ERROR_CODES,
     handleSocketError,
 } from '../utils/socketError.js';
+import {
+    anonymizeUserMessages,
+    deleteGroupMessages,
+} from './groupChatHandler.js';
 
 export const handleGroupEvents = (io, socket) => {
 
     const { username } = socket.user;
 
-    // const { anonymizeUserMessages } = require('./groupChatHandler');
-
     // Create a chat group (creator is initially the only member)
-    socket.on('group:create', async({ groupName } = {}) => {
+    socket.on('group:create', async ({ groupName } = {}) => {
         try {
             if (!groupName?.trim()) {
                 throw new SocketError(SOCKET_ERROR_CODES.BAD_REQUEST, 'Group name is required');
             }
 
             // Check if group already exists
-            const existingGroup = await Group.findOne({ groupName: groupName});
+            const existingGroup = await Group.findOne({ groupName: groupName });
             if (existingGroup) {
                 throw new SocketError(SOCKET_ERROR_CODES.BAD_REQUEST, 'Group already exists');
             }
@@ -37,7 +39,6 @@ export const handleGroupEvents = (io, socket) => {
             // Notify all users that a new group was created so they can update their lists
             io.emit('group:list_updated', newGroup);
             socket.emit('group:created', newGroup);
-
         } catch (error) {
             handleSocketError(socket, 'group:error', error);
         }
@@ -54,7 +55,7 @@ export const handleGroupEvents = (io, socket) => {
     });
 
     // Join a group chat
-    socket.on('group:join', async({ groupName } = {}) => {
+    socket.on('group:join', async ({ groupName } = {}) => {
         try {
             if (!groupName) {
                 throw new SocketError(SOCKET_ERROR_CODES.BAD_REQUEST, 'Group name is required');
@@ -100,6 +101,9 @@ export const handleGroupEvents = (io, socket) => {
                 throw new SocketError(SOCKET_ERROR_CODES.UNAUTHORIZED, 'Only the group leader can delete this group');
             }
 
+            // Delete all group messages
+            await deleteGroupMessages(groupName);
+
             // Delete the group
             await Group.deleteOne({ groupName: groupName });
 
@@ -109,53 +113,53 @@ export const handleGroupEvents = (io, socket) => {
 
             // Notify all users that the group was deleted
             io.emit('group:deleted', { groupName });
-
         } catch (error) {
             handleSocketError(socket, 'group:error', error);
         }
     });
+};
 
-    socket.on('disconnect', async () => {
-        try {
-            if (!username) return;
+export const leaveGroups = async (io, socket, username) => {
+    if (!username) return;
 
-            const userGroups = await Group.find({members: username});
+    // Anonymous username in groups' messages
+    await anonymizeUserMessages(username);
 
-            for (const group of userGroups) {
+    const userGroups = await Group.find({ members: username });
 
-                // Delete member from group's members
-                group.members = group.members.filter(member => member !== username);
+    for (const group of userGroups) {
+        // Delete member from group's members
+        group.members = group.members.filter(
+            member => member !== username
+        );
 
-                // await anonymizeUserMessages(groupName, disconnectedUsername);
+        if (group.members.length === 0) {
+            // Delete all group messages
+            await deleteGroupMessages(group.groupName);
 
-                // io.to(groupName).emit("group:messages_anonymized");
+            // Delete group when no members left
+            await Group.deleteOne({ _id: group._id });
 
-                if (group.members.length === 0) {
-                    
-                    // Delete group when no members left
-                    await Group.deleteOne({ _id: group._id });
-                    io.emit('group:deleted', { groupName: group.groupName });
-                } else {
-
-                    // Change leader when Group leader disconnected
-                    if (group.leaderName === username) {
-                        group.leaderName = group.members[0];
-                    }
-
-                    await group.save();
-
-                    // Notify the group that a leader changed, and update lists globally
-                    io.to(group.name).emit('group:user_left', {
-                        groupName: group.groupName,
-                        username,
-                        newLeader: group.leaderName
-                    });
-
-                    io.emit('group:list_updated', group);
-                }
+            io.emit('group:deleted', {
+                groupName: group.groupName,
+            });
+        } else {
+            // Change leader when Group leader disconnected
+            if (group.leaderName === username) {
+                group.leaderName = group.members[0];
             }
-        } catch (error) {
-            console.error('Error during group cleanup on disconnect:', error);
+
+            await group.save();
+
+            io.to(group.groupName).emit('group:user_left', {
+                groupName: group.groupName,
+                username,
+                newLeader: group.leaderName,
+            });
+
+            io.emit('group:list_updated', group);
         }
-    }); 
+
+        await socket.leave(group.groupName);
+    }
 };
