@@ -9,6 +9,8 @@ export const handleGroupEvents = (io, socket) => {
 
     const { username } = socket.user;
 
+    // const { anonymizeUserMessages } = require('./groupChatHandler');
+
     // Create a chat group (creator is initially the only member)
     socket.on('group:create', async({ groupName } = {}) => {
         try {
@@ -123,6 +125,10 @@ export const handleGroupEvents = (io, socket) => {
 
                 // Delete member from group's members
                 group.members = group.members.filter(member => member !== username);
+
+                // await anonymizeUserMessages(groupName, disconnectedUsername);
+
+                // io.to(groupName).emit("group:messages_anonymized");
 
                 if (group.members.length === 0) {
                     
