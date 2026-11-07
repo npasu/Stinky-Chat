@@ -6,6 +6,7 @@ import {
 } from "../utils/socketError.js";
 import { leaveGroups } from "./groupHandler.js";
 import { deletePrivateChat } from "./privateChatHandler.js";
+import { clearDatabaseIfNoUsers } from "../utils/cleanup.js";
 
 export const handleUserEvents = (io, socket) => {
     const { username } = socket.user;
@@ -86,6 +87,8 @@ export const handleUserDisconnect = async (io, socket) => {
             _id: socket.user._id,
             socketId: socket.id,
         });
+
+        await clearDatabaseIfNoUsers();
 
         console.log(`User disconnected: ${username}`);
 

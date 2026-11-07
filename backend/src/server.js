@@ -1,11 +1,9 @@
+
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
 import connectDB from './config/db.js';
 import { server, io } from './app.js';
-import User from "./models/User.js";
-import Group from './models/Group.js';
-import GroupMessage from './models/GroupMessage.js';
-import PrivateMessage from './models/PrivateMessage.js';
+import { clearDatabase } from './utils/cleanup.js';
 
 dotenv.config({ path: './src/config/.env' });
 
@@ -13,26 +11,12 @@ const PORT = process.env.PORT || 5000;
 
 let isShuttingDown = false;
 
-const clearAllData = async (label) => {
-  const resultUser = await User.deleteMany({}).maxTimeMS(10000);
-  console.log(`[${label}] Deleted ${resultUser.deletedCount} users`);
-
-  const resultGroup = await Group.deleteMany({}).maxTimeMS(10000);
-  console.log(`[${label}] Deleted ${resultGroup.deletedCount} groups`);
-
-  const resultGroupMsg = await GroupMessage.deleteMany({}).maxTimeMS(10000);
-  console.log(`[${label}] Deleted ${resultGroupMsg.deletedCount} group messages`);
-
-  const resultPrivateMsg = await PrivateMessage.deleteMany({}).maxTimeMS(10000);
-  console.log(`[${label}] Deleted ${resultPrivateMsg.deletedCount} private messages`);
-};
-
 const startServer = async () => {
   try {
     await connectDB();
 
-    // Clear all old user data
-    // await clearAllData("startup");
+    // Clear old data from previous server instance
+    await clearDatabase();
 
     server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
@@ -54,19 +38,26 @@ const gracefulShutdown = async (signal) => {
     console.error("Shutdown timed out, forcing exit");
     process.exit(1);
   }, 15000);
+
   forceExit.unref();
 
   try {
-    // Cut all socket (Prevent create user during delete)
+    // Disconnect all Socket.IO clients
     io.disconnectSockets(true);
 
-    // Clear all user data
-    await clearAllData("shutdown");
+    // Close Socket.IO and HTTP server
+    await new Promise((resolve) => {
+      io.close(resolve);
+    });
 
-    await io.close();
+    // Clear all database collections
+    await clearDatabase();
+
+    // Disconnect MongoDB
     await mongoose.disconnect();
 
     console.log("Shutdown completed");
+    clearTimeout(forceExit);
     process.exit(0);
   } catch (error) {
     console.error("Shutdown error:", error);
