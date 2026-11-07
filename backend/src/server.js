@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import connectDB from './config/db.js';
 import { server, io } from './app.js';
 import User from "./models/User.js";
+import Group from './models/Group.js';
+import GroupMessage from './models/GroupMessage.js';
+import PrivateMessage from './models/PrivateMessage.js';
 
 dotenv.config({ path: './src/config/.env' });
 
@@ -10,25 +13,34 @@ const PORT = process.env.PORT || 5000;
 
 let isShuttingDown = false;
 
-const clearAllUsers = async (label) => {
-  const result = await User.deleteMany({}).maxTimeMS(10000);
-  console.log(`[${label}] Deleted ${result.deletedCount} users`);
+const clearAllData = async (label) => {
+  const resultUser = await User.deleteMany({}).maxTimeMS(10000);
+  console.log(`[${label}] Deleted ${resultUser.deletedCount} users`);
+
+  const resultGroup = await Group.deleteMany({}).maxTimeMS(10000);
+  console.log(`[${label}] Deleted ${resultGroup.deletedCount} groups`);
+
+  const resultGroupMsg = await GroupMessage.deleteMany({}).maxTimeMS(10000);
+  console.log(`[${label}] Deleted ${resultGroupMsg.deletedCount} group messages`);
+
+  const resultPrivateMsg = await PrivateMessage.deleteMany({}).maxTimeMS(10000);
+  console.log(`[${label}] Deleted ${resultPrivateMsg.deletedCount} private messages`);
 };
 
 const startServer = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        // Clear all old user data
-        // await clearAllUsers("startup");
+    // Clear all old user data
+    // await clearAllData("startup");
 
-        server.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
-    }
+    server.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 };
 
 const gracefulShutdown = async (signal) => {
@@ -49,7 +61,7 @@ const gracefulShutdown = async (signal) => {
     io.disconnectSockets(true);
 
     // Clear all user data
-    await clearAllUsers("shutdown");
+    await clearAllData("shutdown");
 
     await io.close();
     await mongoose.disconnect();
@@ -62,7 +74,7 @@ const gracefulShutdown = async (signal) => {
   }
 };
 
-// process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-// process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
 startServer();

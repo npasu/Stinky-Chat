@@ -13,7 +13,7 @@ export const handleUserEvents = (io, socket) => {
     // Get current user's profile
     socket.on("user:get_profile", async () => {
         try {
-            const user = await User.findById(socket.user._id);
+            const user = await User.findById(socket.user._id).select("-socketId");
 
             if (!user) {
                 throw new SocketError(SOCKET_ERROR_CODES.NOT_FOUND, "User not found");
@@ -23,6 +23,27 @@ export const handleUserEvents = (io, socket) => {
 
             // Send profile back to the requesting user
             socket.emit("user:profile_loaded", user);
+        } catch (error) {
+            handleSocketError(socket, "user:error", error);
+        }
+    });
+
+    // Get user data from username
+    socket.on("user:get_profile_by_username", async ({ username: targetUsername }) => {
+        try {
+            if (!targetUsername) {
+                throw new SocketError(SOCKET_ERROR_CODES.BAD_REQUEST, "Username is required");
+            }
+
+            const targetUser = await User.findOne({ username: targetUsername }).select("-socketId");
+
+            if (!targetUser) {
+                throw new SocketError(SOCKET_ERROR_CODES.NOT_FOUND, "User profile not found");
+            }
+
+            console.log(`Fetched Profile for ${targetUsername}:`, targetUser);
+
+            socket.emit("user:profile_by_username_loaded", targetUser);
         } catch (error) {
             handleSocketError(socket, "user:error", error);
         }
