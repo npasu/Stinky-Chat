@@ -1,7 +1,14 @@
 import { FaceSlightlySmiling, Heart, ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "../Button";
 
-export function ChatBox({ isSender, message, reactions, user, sender }) {
+export function ChatBox({
+  isSender,
+  message,
+  reactions,
+  user,
+  sender,
+  onEmote,
+}) {
   const bgColor = isSender ? "bg-primary-blue" : "bg-primary-yellow";
   const alignment = isSender ? "self-end" : "self-start";
 
@@ -42,9 +49,9 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
   return (
     <div className={`${alignment} flex w-full gap-3`}>
       {/* Profile Image Left */}
-      {!isSender && (
+      {!isSender && sender && (
         <img
-          src={sender.profile}
+          src={`/profile${sender.avatarId || 0}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />
@@ -62,7 +69,7 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
             </div>
             {Object.entries(reactionIcon).map(([key, renderIcon]) => {
               const users = reactions[key] ?? [];
-              const isActive = users.includes(user.name);
+              const isActive = users.includes(user.username);
 
               return (
                 <div key={key} className="flex items-center gap-0.5">
@@ -72,10 +79,10 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
                     py="py-0"
                     color="yellow"
                     hideShadow={true}
-                    onClick={() => {}}
+                    onClick={() => onEmote(key)}
                     className="h-6 aspect-square flex items-center justify-center"
                     icon={renderIcon(isActive)}
-                  />{" "}
+                  />
                   <p
                     className={`${isActive ? "font-bold" : "font-medium"} text-body`}
                   >
@@ -88,7 +95,11 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
         </div>
 
         {/* Username */}
-        <p className={`${alignment} text-body font-medium`}>{sender.name}</p>
+        {sender && (
+          <p className={`${alignment} text-body font-medium`}>
+            {sender.username}
+          </p>
+        )}
         {/* Message Box */}
         <p
           className={`${bgColor} ${alignment}  max-w-[60%] rounded-3xl break-words px-4 py-2`}
@@ -99,7 +110,7 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
       {/* Profile Image Right */}
       {isSender && (
         <img
-          src={sender.profile}
+          src={`/profile${user.avatarId || 0}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />

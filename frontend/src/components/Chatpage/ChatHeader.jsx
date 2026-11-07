@@ -4,13 +4,14 @@ import { Button } from "../Button";
 
 export function ChatHeader({
   toHome,
-  conversationId,
+  targetName,
   chatType,
   onDeleteClick,
+  isLeader,
 }) {
   return (
     <div className="bg-blue w-full h-24 flex items-center px-24 justify-between">
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 text-h3 font-semibold">
         <Button
           fullRound={true}
           px="px-2"
@@ -20,9 +21,9 @@ export function ChatHeader({
           onClick={toHome}
           icon={<ArrowLeft size={24} strokeWidth={2} />}
         />
-        <p className="text-h3 font-semibold">{conversationId}</p>
+        {targetName}
       </div>
-      {chatType === "GROUP" && (
+      {chatType === "GROUP" && isLeader && (
         <Button
           color="orange"
           px="px-4"
