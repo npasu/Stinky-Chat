@@ -30,8 +30,7 @@ export default function Chat() {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
   const isLeader =
-    chatType === "GROUP" &&
-    user?.username === groupDetail?.leaderName;
+    chatType === "GROUP" && user?.username === groupDetail?.leaderName;
 
   const scrollToBottom = () => {
     chatContainerRef.current?.scrollTo({
@@ -51,7 +50,6 @@ export default function Chat() {
   const handleSendMessage = () => {
     if (!message.trim()) return;
     setMessage("");
-    scrollToBottom();
     if (chatType === "PRIVATE")
       socket.emit("private:send_message", {
         receiverName: targetName,
@@ -91,6 +89,7 @@ export default function Chat() {
   const handleProfileLoaded = (res) => setUser(res);
   const handleOnlineUsersLoaded = (res) => setUserList(res || []);
   const handleChatLoaded = (res) => setChatHistory(res?.history || res || []);
+
   const handleGroupLoaded = (res) => setGroupDetail(res);
   const handleChatUpdated = () => {
     if (chatType === "PRIVATE")
@@ -163,6 +162,12 @@ export default function Chat() {
     };
   }, [navigate]);
 
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      scrollToBottom();
+    }
+  }, [chatHistory]);
+
   return (
     <div className="w-screen h-dvh flex justify-center items-center">
       {targetName ? (
@@ -195,6 +200,7 @@ export default function Chat() {
                       key={index}
                       isSender={option.senderName === user.username}
                       message={option.text}
+                      time={option.createdAt}
                       sender={sender}
                       user={user}
                       reactions={option.reactions}

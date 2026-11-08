@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Entry from "./pages/Entry";
@@ -11,6 +11,8 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/chat" element={<Chat />} />
       <Route path="/chat/:targetName" element={<Chat />} />
+
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }

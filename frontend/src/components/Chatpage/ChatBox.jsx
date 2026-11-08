@@ -4,11 +4,20 @@ import { Button } from "../Button";
 export function ChatBox({
   isSender,
   message,
+  time,
   reactions,
   user,
   sender,
   onEmote,
 }) {
+  const formattedTime = time
+    ? new Date(time).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    : "";
+
   const bgColor = isSender ? "bg-primary-blue" : "bg-primary-yellow";
   const alignment = isSender ? "self-end" : "self-start";
 
@@ -101,12 +110,24 @@ export function ChatBox({
           </p>
         )}
         {/* Message Box */}
-        <p
-          className={`${bgColor} ${alignment}  max-w-[60%] rounded-3xl break-words px-4 py-2`}
-        >
-          {message}
-        </p>
+
+        <div className={` ${alignment} max-w-[60%] flex items-end`}>
+          {isSender && (
+            <p className={`text-small text-dark-gray py-2 px-2`}>
+              {formattedTime}
+            </p>
+          )}
+          <p className={`${bgColor} rounded-3xl break-words px-4 py-2`}>
+            {message}
+          </p>
+          {!isSender && (
+            <p className={`text-small text-dark-gray py-2 px-2`}>
+              {formattedTime}
+            </p>
+          )}
+        </div>
       </div>
+
       {/* Profile Image Right */}
       {isSender && (
         <img
