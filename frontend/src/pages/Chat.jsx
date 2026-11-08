@@ -242,6 +242,22 @@ export default function Chat() {
     }
   }, [chatHistory.length]);
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("pagehide", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pagehide", handleBeforeUnload);
+    };
+  }, [socket]);
+
   return (
     <div className="w-screen h-dvh flex justify-center items-center">
       {targetName ? (
