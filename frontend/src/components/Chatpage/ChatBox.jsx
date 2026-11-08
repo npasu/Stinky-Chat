@@ -1,8 +1,15 @@
-import { FaceSlightlySmiling, Heart, ThumbsDown, ThumbsUp } from "lucide-react";
+import {
+  FaceSlightlySmiling,
+  Heart,
+  ThumbsDown,
+  ThumbsUp,
+  Crown,
+} from "lucide-react";
 import { Button } from "../Button";
 
 export function ChatBox({
   isSender,
+  leader,
   message,
   time,
   reactions,
@@ -104,9 +111,17 @@ export function ChatBox({
         </div>
 
         {/* Username */}
-        <p className={`${alignment} text-body font-medium`}>
-          {sender?.username || "Anonymous"}
-        </p>
+        <div className={`${alignment} flex items-center gap-2`}>
+          <p className="text-body font-medium">
+            {sender?.username || "Anonymous"}
+          </p>
+          {sender?.username === leader && (
+            <Crown
+              size={20}
+              className="fill-primary-yellow text-black stroke-[1.5]"
+            />
+          )}
+        </div>
         {/* Message Box */}
 
         <div className={` ${alignment} max-w-[60%] flex items-end`}>
