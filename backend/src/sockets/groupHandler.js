@@ -117,6 +117,24 @@ export const handleGroupEvents = (io, socket) => {
             handleSocketError(socket, 'group:error', error);
         }
     });
+
+    // Get group detail by groupName
+    socket.on('group:get_detail', async ({ groupName } = {}) => {
+        try {
+            if (!groupName) {
+                throw new SocketError(SOCKET_ERROR_CODES.BAD_REQUEST, 'Group name is required');
+            }
+
+            const group = await Group.findOne({ groupName: groupName });
+            if (!group) {
+                throw new SocketError(SOCKET_ERROR_CODES.NOT_FOUND, 'Group not found');
+            }
+
+            socket.emit('group:detail_loaded', group);
+        } catch (error) {
+            handleSocketError(socket, 'group:error', error);
+        }
+    });
 };
 
 export const leaveGroups = async (io, socket, username) => {
