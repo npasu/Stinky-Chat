@@ -98,6 +98,22 @@ function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("pagehide", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pagehide", handleBeforeUnload);
+    };
+  }, [socket]);
+
   return (
     <div className="w-screen h-dvh overflow-hidden flex flex-col items-center">
       {/* Cat ears and header text */}
