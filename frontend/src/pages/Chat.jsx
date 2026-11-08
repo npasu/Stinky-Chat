@@ -84,12 +84,19 @@ export default function Chat() {
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
+
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
     setMessage("");
 
     // Clear AI memory on send
     baseMessage.current = "";
-    resetTranscript();
-    SpeechRecognition.abortListening();
+    
+    setTimeout(() => {
+      resetTranscript();
+    }, 100);
+
     scrollToBottom();
 
     // Main branch logic: Emit send message event
