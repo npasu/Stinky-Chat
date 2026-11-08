@@ -99,7 +99,7 @@ export default function Chat() {
     setTimeout(() => {
       resetTranscript();
       isSendingRef.current = false;
-    }, 100);
+    }, 150);
 
     scrollToBottom();
 
