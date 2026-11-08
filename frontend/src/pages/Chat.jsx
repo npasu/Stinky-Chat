@@ -43,6 +43,7 @@ export default function Chat() {
 
   // --- AI Feature State & Hooks ---
   const baseMessage = useRef("");
+  const isSendingRef = useRef(false);
   const {
     transcript,
     listening,
@@ -52,7 +53,7 @@ export default function Chat() {
 
   // Append the transcript instead of overwriting
   useEffect(() => {
-    if (transcript) {
+    if (transcript && !isSendingRef.current) {
       // Add a space between typed text and spoken text if needed
       const space = baseMessage.current ? " " : "";
       setMessage(baseMessage.current + space + transcript);
@@ -84,6 +85,8 @@ export default function Chat() {
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
+
+    isSendingRef.current = true;
 
     if (listening) {
       SpeechRecognition.stopListening();
