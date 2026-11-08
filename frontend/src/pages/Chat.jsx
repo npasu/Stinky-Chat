@@ -5,8 +5,10 @@ import { useSocket } from "../hooks/useSocket";
 
 import { Bot } from "lucide-react";
 
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import 'regenerator-runtime/runtime';
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import "regenerator-runtime/runtime";
 
 import { BlankChat } from "../components/Chatpage/BlankChat";
 import { ChatHeader } from "../components/Chatpage/ChatHeader";
@@ -41,7 +43,12 @@ export default function Chat() {
 
   // --- AI Feature State & Hooks ---
   const baseMessage = useRef("");
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
 
   // Append the transcript instead of overwriting
   useEffect(() => {
@@ -78,12 +85,12 @@ export default function Chat() {
   const handleSendMessage = () => {
     if (!message.trim()) return;
     setMessage("");
-    
+
     // Clear AI memory on send
-    baseMessage.current = ""; 
-    resetTranscript(); 
+    baseMessage.current = "";
+    resetTranscript();
     scrollToBottom();
-    
+
     // Main branch logic: Emit send message event
     if (chatType === "PRIVATE")
       socket.emit("private:send_message", {
@@ -99,7 +106,9 @@ export default function Chat() {
 
   const handleRecord = () => {
     if (!browserSupportsSpeechRecognition) {
-      alert("Your browser does not support speech recognition. Please use Google Chrome.");
+      alert(
+        "Your browser does not support speech recognition. Please use Google Chrome.",
+      );
       return;
     }
 
@@ -109,7 +118,7 @@ export default function Chat() {
       // Save current text and reset AI memory right before listening starts
       baseMessage.current = message;
       resetTranscript();
-      SpeechRecognition.startListening({ continuous: true, language: 'th-TH' }); // Thai language
+      SpeechRecognition.startListening({ continuous: true, language: "th-TH" }); // Thai language
     }
   };
 
@@ -236,7 +245,6 @@ export default function Chat() {
             ref={chatContainerRef}
             className="relative z-10 bg-white w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
           >
-            
             <div className="flex flex-col gap-8 px-24 pt-4 pb-8">
               {user &&
                 userList &&
@@ -249,6 +257,7 @@ export default function Chat() {
                     <ChatBox
                       key={index}
                       isSender={option.senderName === user.username}
+                      leader={groupDetail?.leaderName || ""}
                       message={option.text}
                       time={option.createdAt}
                       sender={onlineUser}
@@ -262,7 +271,9 @@ export default function Chat() {
               {/* AI Working Indicator */}
               <div
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  listening ? "max-h-20 opacity-100 mt-2 mb-2" : "max-h-0 opacity-0 m-0"
+                  listening
+                    ? "max-h-20 opacity-100 mt-2 mb-2"
+                    : "max-h-0 opacity-0 m-0"
                 }`}
               >
                 <div className="flex items-center gap-4 animate-pulse">
