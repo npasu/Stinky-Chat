@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useSocket } from "../hooks/useSocket";
 
 import { TextInput } from "../components/TextInput";
 import { Button } from "../components/Button";
 
 function Entry() {
   const navigate = useNavigate();
+  const { socket, isConnected, socketError, setSocketError } = useSocket();
 
   const [name, setName] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const [selectedProfile, setSelectedProfile] = useState(0);
+  const [selectedProfile, setSelectedProfile] = useState(1);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const catProfiles = [
     "/profile1.svg",
@@ -20,9 +22,38 @@ function Entry() {
     "/profile5.svg",
   ];
 
-  const handleStart = (name) => {
-    if (name === "test") setErrorMsg(`"${name}" is already existed`);
-    else navigate("/home");
+  useEffect(() => {
+    if (isConnected) {
+      setIsConnecting(false);
+      navigate("/home");
+    }
+
+    if (socketError) {
+      setIsConnecting(false);
+    }
+  }, [isConnected, navigate, socketError]);
+
+  const handleStart = () => {
+    if (isConnecting || isConnected) return;
+
+    setIsConnecting(true);
+    setSocketError(null);
+
+    localStorage.setItem("username", name);
+    localStorage.setItem("avatarId", selectedProfile);
+
+    socket.auth = {
+      username: name,
+      avatarId: selectedProfile,
+    };
+    socket.connect();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleStart();
+    }
   };
 
   return (
@@ -58,15 +89,18 @@ function Entry() {
         <div className="space-y-2 w-full">
           <div className="flex items-center gap-2">
             <p className="text-h3 font-semibold text-black self-start">Name</p>
-            <p className="text-subtle font-thin text-primary-orange">
-              {errorMsg}
-            </p>
+            {socketError && (
+              <p className="text-subtle font-thin text-primary-orange">
+                {socketError.message}
+              </p>
+            )}
           </div>
           <TextInput
             value={name}
             onChange={setName}
             placeholder="Enter your name"
             className="w-full"
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="space-y-2 w-full">
@@ -77,12 +111,12 @@ function Entry() {
               <Button
                 key={index}
                 fullRound={true}
-                onClick={() => setSelectedProfile(index)}
+                onClick={() => setSelectedProfile(index + 1)}
                 hideShadow={true}
                 px={0}
                 py={0}
                 className={`${
-                  selectedProfile === index
+                  selectedProfile === index + 1
                     ? "border-black border-2"
                     : "border-transparent hover:border-gray-200 border-2"
                 }`}
@@ -96,13 +130,14 @@ function Entry() {
             ))}
           </div>
         </div>
+        {/* Start Button */}
         <Button
           color="yellow"
-          disabled={name === ""}
+          disabled={name === "" || isConnecting}
           className="font-medium"
-          onClick={() => handleStart(name)}
+          onClick={handleStart}
         >
-          Start
+          {isConnecting ? "Connecting..." : "Start"}
         </Button>
       </div>
     </div>

@@ -1,6 +1,7 @@
-import { handleUserEvents } from './userHandler.js';
+import { handleUserEvents, handleUserDisconnect } from './userHandler.js';
 import { handleGroupEvents } from './groupHandler.js';
-import { handleChatEvents } from './chatHandler.js';
+import { handlePrivateChatEvents } from './privateChatHandler.js';
+import { handleGroupChatEvents } from './groupChatHandler.js';
 
 export const setupSocketEvents = (io) => {
     io.on('connection', (socket) => {
@@ -8,10 +9,11 @@ export const setupSocketEvents = (io) => {
 
         handleUserEvents(io, socket);
         handleGroupEvents(io, socket);
-        handleChatEvents(io, socket);
+        handlePrivateChatEvents(io, socket);
+        handleGroupChatEvents(io, socket);
 
-        socket.on('disconnect', () => {
-            console.log(`Client disconnected: ${socket.id}`);
+        socket.on('disconnect', async () => {
+            await handleUserDisconnect(io, socket);
         });
     });
 }

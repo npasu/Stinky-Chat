@@ -1,7 +1,23 @@
 import { FaceSlightlySmiling, Heart, ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "../Button";
 
-export function ChatBox({ isSender, message, reactions, user, sender }) {
+export function ChatBox({
+  isSender,
+  message,
+  time,
+  reactions,
+  user,
+  sender,
+  onEmote,
+}) {
+  const formattedTime = time
+    ? new Date(time).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    : "";
+
   const bgColor = isSender ? "bg-primary-blue" : "bg-primary-yellow";
   const alignment = isSender ? "self-end" : "self-start";
 
@@ -44,7 +60,7 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
       {/* Profile Image Left */}
       {!isSender && (
         <img
-          src={sender.profile}
+          src={`/profile${sender?.avatarId || 0}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />
@@ -62,7 +78,7 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
             </div>
             {Object.entries(reactionIcon).map(([key, renderIcon]) => {
               const users = reactions[key] ?? [];
-              const isActive = users.includes(user.name);
+              const isActive = users.includes(user.username);
 
               return (
                 <div key={key} className="flex items-center gap-0.5">
@@ -72,10 +88,10 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
                     py="py-0"
                     color="yellow"
                     hideShadow={true}
-                    onClick={() => {}}
+                    onClick={() => onEmote(key)}
                     className="h-6 aspect-square flex items-center justify-center"
                     icon={renderIcon(isActive)}
-                  />{" "}
+                  />
                   <p
                     className={`${isActive ? "font-bold" : "font-medium"} text-body`}
                   >
@@ -88,18 +104,32 @@ export function ChatBox({ isSender, message, reactions, user, sender }) {
         </div>
 
         {/* Username */}
-        <p className={`${alignment} text-body font-medium`}>{sender.name}</p>
-        {/* Message Box */}
-        <p
-          className={`${bgColor} ${alignment}  max-w-[60%] rounded-3xl break-words px-4 py-2`}
-        >
-          {message}
+        <p className={`${alignment} text-body font-medium`}>
+          {sender?.username || "Anonymous"}
         </p>
+        {/* Message Box */}
+
+        <div className={` ${alignment} max-w-[60%] flex items-end`}>
+          {isSender && (
+            <p className={`text-small text-dark-gray py-2 px-2`}>
+              {formattedTime}
+            </p>
+          )}
+          <p className={`${bgColor} rounded-3xl break-words px-4 py-2`}>
+            {message}
+          </p>
+          {!isSender && (
+            <p className={`text-small text-dark-gray py-2 px-2`}>
+              {formattedTime}
+            </p>
+          )}
+        </div>
       </div>
+
       {/* Profile Image Right */}
       {isSender && (
         <img
-          src={sender.profile}
+          src={`/profile${user.avatarId || 1}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />

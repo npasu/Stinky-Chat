@@ -10,6 +10,13 @@ export function ChatFooter({
   onRecord,
   isRecording,
 }) {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSendMessage();
+    }
+  };
+
   return (
     <div className="bg-blue w-full h-24 flex items-center px-24 gap-6 justify-center">
       <TextInput
@@ -18,6 +25,7 @@ export function ChatFooter({
         placeholder="Type a message"
         className="bg-white w-full h-10"
         borderWeight="border-0"
+        onKeyDown={handleKeyDown}
       />
       <Button
         fullRound={true}
