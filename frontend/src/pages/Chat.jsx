@@ -6,6 +6,11 @@ import { Bot } from "lucide-react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import 'regenerator-runtime/runtime';
 
+import { Bot } from "lucide-react";
+
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import 'regenerator-runtime/runtime';
+
 import { BlankChat } from "../components/Chatpage/BlankChat";
 import { ChatHeader } from "../components/Chatpage/ChatHeader";
 import { ChatFooter } from "../components/Chatpage/ChatFooter";
@@ -21,13 +26,46 @@ export default function Chat() {
   const chatContainerRef = useRef(null);
 
   const [message, setMessage] = useState("");
+<<<<<<< Updated upstream
   // Add a ref to remember text typed before the mic was turned on
   const baseMessage = useRef("");
 
   const [user, setUser] = useState({ name: "user1" });
 
+||||||| Stash base
+  const [chatHistory, setChatHistory] = useState([]);
+  const [user, setUser] = useState(null);
+  const [groupDetail, setGroupDetail] = useState(null);
+=======
+
+  // --- States from Main ---
+  const [chatHistory, setChatHistory] = useState([]);
+  const [user, setUser] = useState(null);
+  const [groupDetail, setGroupDetail] = useState(null);
+>>>>>>> Stashed changes
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
+  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
+
+  // Append the transcript instead of overwriting
+  useEffect(() => {
+    if (transcript) {
+      // Add a space between typed text and spoken text if needed
+      const space = baseMessage.current ? " " : "";
+      setMessage(baseMessage.current + space + transcript);
+    }
+  }, [transcript]);
+
+  useEffect(() => {
+    if (listening) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [listening]);
+
+  // --- AI Feature State & Hooks ---
+  const baseMessage = useRef("");
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
   // Append the transcript instead of overwriting
@@ -68,11 +106,43 @@ export default function Chat() {
     console.log("Send:", message);
 
     setMessage("");
+<<<<<<< Updated upstream
     baseMessage.current = ""; // Clear memory on send
     resetTranscript(); // Clear the AI transcript when the message sends
     scrollToBottom();
+||||||| Stash base
+    if (chatType === "PRIVATE")
+      socket.emit("private:send_message", {
+        receiverName: targetName,
+        text: message,
+      });
+    else
+      socket.emit("group:send_message", {
+        groupName: targetName,
+        text: message,
+      });
+=======
+    
+    // Clear AI memory on send
+    baseMessage.current = ""; 
+    resetTranscript(); 
+    scrollToBottom();
+    
+    // Main branch logic: Emit send message event
+    if (chatType === "PRIVATE")
+      socket.emit("private:send_message", {
+        receiverName: targetName,
+        text: message,
+      });
+    else
+      socket.emit("group:send_message", {
+        groupName: targetName,
+        text: message,
+      });
+>>>>>>> Stashed changes
   };
 
+<<<<<<< Updated upstream
   const handleRecord = () => {
     if (!browserSupportsSpeechRecognition) {
       alert("Your browser does not support speech recognition. Please use Google Chrome.");
@@ -81,6 +151,37 @@ export default function Chat() {
 
     if (listening) {
       SpeechRecognition.stopListening();
+||||||| Stash base
+  const handleReact = (messageId, emoji) => {
+    if (chatType === "PRIVATE") {
+      socket.emit("private:react", {
+        messageId: messageId,
+        emoji: emoji,
+      });
+=======
+  const handleRecord = () => {
+    if (!browserSupportsSpeechRecognition) {
+      alert("Your browser does not support speech recognition. Please use Google Chrome.");
+      return;
+    }
+
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      // Save current text and reset AI memory right before listening starts
+      baseMessage.current = message;
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true, language: 'th-TH' }); // Thai language
+    }
+  };
+
+  const handleReact = (messageId, emoji) => {
+    if (chatType === "PRIVATE") {
+      socket.emit("private:react", {
+        messageId: messageId,
+        emoji: emoji,
+      });
+>>>>>>> Stashed changes
     } else {
       // Save current text and reset AI memory right before listening starts
       baseMessage.current = message;
@@ -124,6 +225,7 @@ export default function Chat() {
                 />
               ))}
 
+<<<<<<< Updated upstream
               {/* AI Working Indicator */}
               <div
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
@@ -139,6 +241,51 @@ export default function Chat() {
                   </span>
                 </div>
               </div>
+||||||| Stash base
+                  return (
+                    <ChatBox
+                      key={index}
+                      isSender={option.senderName === user.username}
+                      message={option.text}
+                      time={option.createdAt}
+                      sender={onlineUser}
+                      user={user}
+                      reactions={option.reactions}
+                      onEmote={(emoji) => handleReact(option._id, emoji)}
+                    />
+                  );
+                })}
+=======
+                  return (
+                    <ChatBox
+                      key={index}
+                      isSender={option.senderName === user.username}
+                      message={option.text}
+                      time={option.createdAt}
+                      sender={onlineUser}
+                      user={user}
+                      reactions={option.reactions}
+                      onEmote={(emoji) => handleReact(option._id, emoji)}
+                    />
+                  );
+                })}
+
+              {/* AI Working Indicator */}
+              <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  listening ? "max-h-20 opacity-100 mt-2 mb-2" : "max-h-0 opacity-0 m-0"
+                }`}
+              >
+                <div className="flex items-center gap-4 animate-pulse">
+                  <div className="w-10 h-10 bg-primary-orange rounded-full flex items-center justify-center text-white shadow-sm">
+                    <Bot size={24} strokeWidth={2} />
+                  </div>
+                  <span className="text-primary-orange font-medium text-body">
+                    Ai is working ...
+                  </span>
+                </div>
+              </div>
+>>>>>>> Stashed changes
             </div>
           </div>
           <ChatFooter
