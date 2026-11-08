@@ -96,7 +96,7 @@ export default function Chat() {
       socket.emit("private:get_history", { receiverName: targetName });
     else socket.emit("group:get_history", { groupName: targetName });
   };
-  const handleGroupUserLeft = () => {
+  const handleGroupUserChange = () => {
     socket.emit("group:get_detail", { groupName: targetName });
     socket.emit("group:get_history", { groupName: targetName });
   };
@@ -130,7 +130,8 @@ export default function Chat() {
       socket.on("group:history_loaded", handleChatLoaded);
       socket.on("group:message_received", handleChatUpdated);
       socket.on("group:reaction_updated", handleChatUpdated);
-      socket.on("group:user_left", handleGroupUserLeft);
+      socket.on("group:user_left", handleGroupUserChange);
+      socket.on("group:user_joined", handleGroupUserChange);
     }
 
     // Cleanup Function
@@ -147,7 +148,8 @@ export default function Chat() {
         socket.off("group:history_loaded", handleChatLoaded);
         socket.off("group:message_received", handleChatUpdated);
         socket.off("group:reaction_updated", handleChatUpdated);
-        socket.off("group:user_left", handleGroupUserLeft);
+        socket.off("group:user_left", handleGroupUserChange);
+        socket.off("group:user_joined", handleGroupUserChange);
       }
     };
   }, [isConnected, navigate, socket, chatType, targetName]);
@@ -166,7 +168,7 @@ export default function Chat() {
     if (chatHistory.length > 0) {
       scrollToBottom();
     }
-  }, [chatHistory]);
+  }, [chatHistory.length]);
 
   return (
     <div className="w-screen h-dvh flex justify-center items-center">
@@ -191,17 +193,13 @@ export default function Chat() {
                     (u) => u?.username === option.senderName,
                   );
 
-                  const sender =
-                    option.senderName === "Anonymous"
-                      ? { username: "Anonymous", avatarId: 0 }
-                      : onlineUser;
                   return (
                     <ChatBox
                       key={index}
                       isSender={option.senderName === user.username}
                       message={option.text}
                       time={option.createdAt}
-                      sender={sender}
+                      sender={onlineUser}
                       user={user}
                       reactions={option.reactions}
                       onEmote={(emoji) => handleReact(option._id, emoji)}

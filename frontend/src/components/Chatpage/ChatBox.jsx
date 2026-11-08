@@ -60,7 +60,7 @@ export function ChatBox({
       {/* Profile Image Left */}
       {!isSender && (
         <img
-          src={`/profile${sender?.avatarId || 1}.svg`}
+          src={`/profile${sender?.avatarId || 0}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />
@@ -104,11 +104,9 @@ export function ChatBox({
         </div>
 
         {/* Username */}
-        {sender && (
-          <p className={`${alignment} text-body font-medium`}>
-            {sender.username}
-          </p>
-        )}
+        <p className={`${alignment} text-body font-medium`}>
+          {sender?.username || "Anonymous"}
+        </p>
         {/* Message Box */}
 
         <div className={` ${alignment} max-w-[60%] flex items-end`}>
