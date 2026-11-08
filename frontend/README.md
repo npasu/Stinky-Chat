@@ -1,30 +1,31 @@
-﻿# Stinky Chat Frontend
+﻿# Stinky Chat — Frontend
 
-Stinky Chat is a real-time chat application frontend built with React and Vite. It connects to a Socket.IO backend and provides a responsive user interface for private chats, group chats, online user discovery, and voice-to-text messaging.
+Frontend application for Stinky Chat, a real-time chat application built with **React 19 and Vite**.
 
-This project is the client-side portion of the Stinky Chat system and is designed to work with a backend that exposes Socket.IO events for user, group, and message operations.
+The frontend provides an interactive chat interface for private messaging, group conversations, online user discovery, and voice-to-text input. It communicates with the backend through Socket.IO Client.
 
 ## Tech Stack
 
-- React 19
-- Vite
-- React Router
-- Socket.IO Client
-- Tailwind CSS
-- Lucide React
-- react-speech-recognition
+| Technology | Purpose |
+| --- | --- |
+| React 19 | Component-based UI development |
+| Vite | Development server and build tool |
+| React Router | Client-side routing |
+| Socket.IO Client | Real-time communication with the backend |
+| Tailwind CSS | Utility-first CSS styling |
+| Lucide React | Icon library |
+| react-speech-recognition | Voice-to-text input |
 
-## Current Features
+## Features
 
-- Username entry screen with avatar selection
-- Online friend list and group list views
-- Private chat UI with direct messaging
-- Group chat creation and join flow
-- Group member viewing and leader-only group deletion
-- Live message updates via Socket.IO
-- Message reactions
-- Voice input support for Thai speech recognition
-- Responsive layout for desktop-style chat experience
+- **User Entry:** Username entry and avatar selection.
+- **Online Users:** View available users and their online status.
+- **Private Chat:** Send and receive direct messages in real time.
+- **Group Chat:** Create groups, join conversations, and view group members.
+- **Group Management:** View group details and support leader-only group deletion.
+- **Message Reactions:** React to messages using emojis.
+- **Voice Input:** Convert Thai speech into text using speech recognition.
+- **Responsive Interface:** Chat-oriented layout with reusable UI components.
 
 ## Project Structure
 
@@ -73,90 +74,135 @@ frontend/
 ├── eslint.config.js
 ├── index.html
 ├── package.json
-├── README.md
+├── package-lock.json
 ├── vercel.json
 ├── vite.config.js
-└── package-lock.json
+└── README.md
 ```
 
-## Environment Setup
+## Prerequisites
 
-Create a local environment file from the example:
+Before running the frontend, make sure you have:
 
-```bash
-cp .env.example .env
-```
+- Node.js 18 or later
+- npm
+- A running Stinky Chat backend with Socket.IO enabled
 
-The app expects a Socket.IO backend URL in `.env`:
+## Environment Variables
+
+Create a local `.env` file in the `frontend/` directory based on `.env.example`.
 
 ```env
 VITE_SOCKET_URL=http://localhost:5000
 ```
 
-If your backend runs elsewhere, replace the value accordingly.
+| Variable | Description |
+|---|---|
+| `VITE_SOCKET_URL` | URL of the backend Socket.IO server |
 
-## Prerequisites
+**Important:**
 
-- Node.js 18+
-- npm
-- A running Stinky Chat backend exposing Socket.IO on the configured URL
+- Vite exposes environment variables to client-side code only when they use the `VITE_` prefix.
+- Never store secrets or private credentials in frontend environment variables.
+- Update the backend URL when connecting to a different environment.
 
-## Scripts
+## Getting Started
 
-```bash
-npm install
-npm run dev
-npm run build
-npm run preview
-npm run lint
-```
+### 1. Install Dependencies
 
-### Script descriptions
-
-- `npm run dev` starts the Vite development server
-- `npm run build` creates a production build
-- `npm run preview` serves the production build locally
-- `npm run lint` runs ESLint checks
-
-## Running the App
-
-1. Install dependencies:
+From the `frontend/` directory, run:
 
 ```bash
 npm install
 ```
 
-2. Configure the backend URL in `.env`.
+### 2. Configure Environment Variables
 
-3. Start the backend server that the frontend should connect to.
+Create `.env` and set `VITE_SOCKET_URL` to your backend URL.
 
-4. Run the frontend:
+For local development:
+
+```env
+VITE_SOCKET_URL=http://localhost:5000
+```
+
+### 3. Start the Backend
+
+Make sure the backend server is running and accessible at the configured URL.
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
 ```
 
-5. Open the local Vite URL shown in the terminal, usually:
+Vite will start the development server. Open the local URL displayed in the terminal, usually:
 
 ```text
 http://localhost:5173
 ```
 
-## App Flow
+## Available Scripts
 
-- The entry screen collects a username and avatar.
-- After connection succeeds, the app navigates to the home screen.
-- The home screen loads the current user profile, online users, and group list.
-- Selecting a private contact or a group opens a chat page.
-- Messages are sent through Socket.IO events and updated in real time.
-- Group leaders can delete their group, while members can view group details.
+| Command | Description |
+| --- | --- |
+| `npm install` | Install project dependencies |
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Build the application for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint checks |
 
-## Deployment Notes
+## Application Structure
 
-This frontend includes a Vercel rewrite config (`vercel.json`) so SPA routes are handled correctly.
+The frontend follows a component-based architecture.
 
-For deployment, set the environment variable in the hosting platform:
+- **`pages/`** — Main application pages, including user entry, home, and chat.
+- **`components/`** — Reusable UI components, chat interfaces, and popups.
+- **`hooks/`** — Custom React hooks for managing application behavior.
+- **`lib/`** — Shared utilities and Socket.IO client configuration.
+- **`public/`** — Static assets such as avatars, icons, and the website favicon.
+
+### Socket.IO Integration
+
+The frontend uses Socket.IO Client to communicate with the backend.
+
+- `lib/socket.js` initializes the Socket.IO client.
+- `hooks/useSocket.js` manages connection state and socket event listeners.
+- Application pages emit and listen for events to handle user activity, private messages, group messages, and reactions.
+
+## Deployment
+
+The frontend is deployed on **Vercel**.
+
+### Vercel Configuration
+
+Set the following environment variable in the Vercel project settings:
 
 ```env
-VITE_SOCKET_URL=https://your-socket-backend-url
+VITE_SOCKET_URL=https://<your-render-backend-domain>
 ```
+
+Make sure the URL points to the deployed backend Socket.IO server.
+
+### Deployment Notes
+
+- Vite environment variables are embedded during the build process. Redeploy the frontend after changing environment variables.
+- Ensure the backend CORS configuration allows the deployed frontend origin.
+- The project includes `vercel.json` to configure SPA routing and support client-side navigation.
+- Push changes to the connected Git repository to trigger a new deployment.
+
+## Production Build
+
+To generate a production build locally:
+
+```bash
+npm run build
+```
+
+To preview the generated build:
+
+```bash
+npm run preview
+```
+
+The production output is generated in the `dist/` directory.
