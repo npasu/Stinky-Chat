@@ -3,6 +3,11 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useSocket } from "../hooks/useSocket";
 
+import { Bot } from "lucide-react";
+
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import 'regenerator-runtime/runtime';
+
 import { BlankChat } from "../components/Chatpage/BlankChat";
 import { ChatHeader } from "../components/Chatpage/ChatHeader";
 import { ChatFooter } from "../components/Chatpage/ChatFooter";
@@ -24,6 +29,8 @@ export default function Chat() {
 
   const [userList, setUserList] = useState([]);
   const [message, setMessage] = useState("");
+
+  // --- States from Main ---
   const [chatHistory, setChatHistory] = useState([]);
   const [user, setUser] = useState(null);
   const [groupDetail, setGroupDetail] = useState(null);
@@ -31,6 +38,27 @@ export default function Chat() {
 
   const isLeader =
     chatType === "GROUP" && user?.username === groupDetail?.leaderName;
+
+  // --- AI Feature State & Hooks ---
+  const baseMessage = useRef("");
+  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
+
+  // Append the transcript instead of overwriting
+  useEffect(() => {
+    if (transcript) {
+      // Add a space between typed text and spoken text if needed
+      const space = baseMessage.current ? " " : "";
+      setMessage(baseMessage.current + space + transcript);
+    }
+  }, [transcript]);
+
+  useEffect(() => {
+    if (listening) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [listening]);
 
   const scrollToBottom = () => {
     chatContainerRef.current?.scrollTo({
@@ -41,15 +69,22 @@ export default function Chat() {
 
   const handleMessageChange = (value) => {
     setMessage(value);
-  };
 
-  const handleRecord = () => {
-    console.log("Recording");
+    // Keep the AI and text box in sync when user backspaces/types manually
+    baseMessage.current = value;
+    resetTranscript();
   };
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
     setMessage("");
+    
+    // Clear AI memory on send
+    baseMessage.current = ""; 
+    resetTranscript(); 
+    scrollToBottom();
+    
+    // Main branch logic: Emit send message event
     if (chatType === "PRIVATE")
       socket.emit("private:send_message", {
         receiverName: targetName,
@@ -60,6 +95,22 @@ export default function Chat() {
         groupName: targetName,
         text: message,
       });
+  };
+
+  const handleRecord = () => {
+    if (!browserSupportsSpeechRecognition) {
+      alert("Your browser does not support speech recognition. Please use Google Chrome.");
+      return;
+    }
+
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      // Save current text and reset AI memory right before listening starts
+      baseMessage.current = message;
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true, language: 'th-TH' }); // Thai language
+    }
   };
 
   const handleReact = (messageId, emoji) => {
@@ -185,6 +236,7 @@ export default function Chat() {
             ref={chatContainerRef}
             className="relative z-10 bg-white w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
           >
+            
             <div className="flex flex-col gap-8 px-24 pt-4 pb-8">
               {user &&
                 userList &&
@@ -206,6 +258,22 @@ export default function Chat() {
                     />
                   );
                 })}
+
+              {/* AI Working Indicator */}
+              <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  listening ? "max-h-20 opacity-100 mt-2 mb-2" : "max-h-0 opacity-0 m-0"
+                }`}
+              >
+                <div className="flex items-center gap-4 animate-pulse">
+                  <div className="w-10 h-10 bg-primary-orange rounded-full flex items-center justify-center text-white shadow-sm">
+                    <Bot size={24} strokeWidth={2} />
+                  </div>
+                  <span className="text-primary-orange font-medium text-body">
+                    Ai is working ...
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
           <ChatFooter
@@ -213,6 +281,7 @@ export default function Chat() {
             onMessageChange={handleMessageChange}
             onSendMessage={handleSendMessage}
             onRecord={handleRecord}
+            isRecording={listening}
           />
         </div>
       ) : (
