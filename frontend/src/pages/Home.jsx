@@ -149,6 +149,20 @@ function Home() {
           </Button>
         </div>
         <div className="flex-1 min-h-0 py-4 px-18 flex flex-col gap-3 overflow-y-auto overflow-x-hidden overscroll-contain">
+          {user && (
+            <ChatList
+              name={user.username}
+              profileIcon={
+                <img
+                  src={`/profile${user.avatarId}.svg`}
+                  alt=""
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              }
+              isUserProfile={true}
+            />
+          )}
+          <hr className="h-1 bg-dark-gray border-0"></hr>
           {selectedType === "PRIVATE"
             ? userList.length > 0 &&
               // Private chat

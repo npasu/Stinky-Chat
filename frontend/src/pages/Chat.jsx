@@ -30,8 +30,7 @@ export default function Chat() {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
   const isLeader =
-    chatType === "GROUP" &&
-    user?.username === groupDetail?.leaderName;
+    chatType === "GROUP" && user?.username === groupDetail?.leaderName;
 
   const scrollToBottom = () => {
     chatContainerRef.current?.scrollTo({
@@ -51,7 +50,6 @@ export default function Chat() {
   const handleSendMessage = () => {
     if (!message.trim()) return;
     setMessage("");
-    scrollToBottom();
     if (chatType === "PRIVATE")
       socket.emit("private:send_message", {
         receiverName: targetName,
@@ -91,13 +89,14 @@ export default function Chat() {
   const handleProfileLoaded = (res) => setUser(res);
   const handleOnlineUsersLoaded = (res) => setUserList(res || []);
   const handleChatLoaded = (res) => setChatHistory(res?.history || res || []);
+
   const handleGroupLoaded = (res) => setGroupDetail(res);
   const handleChatUpdated = () => {
     if (chatType === "PRIVATE")
       socket.emit("private:get_history", { receiverName: targetName });
     else socket.emit("group:get_history", { groupName: targetName });
   };
-  const handleGroupUserLeft = () => {
+  const handleGroupUserChange = () => {
     socket.emit("group:get_detail", { groupName: targetName });
     socket.emit("group:get_history", { groupName: targetName });
   };
@@ -131,7 +130,8 @@ export default function Chat() {
       socket.on("group:history_loaded", handleChatLoaded);
       socket.on("group:message_received", handleChatUpdated);
       socket.on("group:reaction_updated", handleChatUpdated);
-      socket.on("group:user_left", handleGroupUserLeft);
+      socket.on("group:user_left", handleGroupUserChange);
+      socket.on("group:user_joined", handleGroupUserChange);
     }
 
     // Cleanup Function
@@ -148,7 +148,8 @@ export default function Chat() {
         socket.off("group:history_loaded", handleChatLoaded);
         socket.off("group:message_received", handleChatUpdated);
         socket.off("group:reaction_updated", handleChatUpdated);
-        socket.off("group:user_left", handleGroupUserLeft);
+        socket.off("group:user_left", handleGroupUserChange);
+        socket.off("group:user_joined", handleGroupUserChange);
       }
     };
   }, [isConnected, navigate, socket, chatType, targetName]);
@@ -162,6 +163,12 @@ export default function Chat() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [navigate]);
+
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      scrollToBottom();
+    }
+  }, [chatHistory.length]);
 
   return (
     <div className="w-screen h-dvh flex justify-center items-center">
@@ -186,16 +193,13 @@ export default function Chat() {
                     (u) => u?.username === option.senderName,
                   );
 
-                  const sender =
-                    option.senderName === "Anonymous"
-                      ? { username: "Anonymous", avatarId: 0 }
-                      : onlineUser;
                   return (
                     <ChatBox
                       key={index}
                       isSender={option.senderName === user.username}
                       message={option.text}
-                      sender={sender}
+                      time={option.createdAt}
+                      sender={onlineUser}
                       user={user}
                       reactions={option.reactions}
                       onEmote={(emoji) => handleReact(option._id, emoji)}
