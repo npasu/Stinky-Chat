@@ -75,10 +75,6 @@ export default function Chat() {
     resetTranscript();
   };
 
-  const handleRecord = () => {
-    console.log("Recording");
-  };
-
   const handleSendMessage = () => {
     if (!message.trim()) return;
     setMessage("");
