@@ -89,6 +89,7 @@ export default function Chat() {
     // Clear AI memory on send
     baseMessage.current = "";
     resetTranscript();
+    SpeechRecognition.stopListening();
     scrollToBottom();
 
     // Main branch logic: Emit send message event
