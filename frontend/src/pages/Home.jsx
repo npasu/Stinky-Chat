@@ -27,14 +27,17 @@ function Home() {
   const isPopupOpenRef = useRef(isPopupOpen);
   const isMembersPopupOpenRef = useRef(isMembersPopupOpen);
 
-  const handleCreateGroup = (groupName) => {
+  const handleCreateGroup = (groupName) =>
     socket.emit("group:create", { groupName });
-    setIsPopupOpen(false);
-    navigate(`/chat/${encodeURIComponent(groupName)}?type=GROUP`);
-  };
+
   const handleJoinGroup = (groupName) => {
     socket.emit("group:join", { groupName });
     navigate(`/chat/${encodeURIComponent(groupName)}?type=GROUP`);
+  };
+
+  const handleGroupCreated = (newGroup) => {
+    setIsPopupOpen(false);
+    navigate(`/chat/${encodeURIComponent(newGroup.groupName)}?type=GROUP`);
   };
 
   // Named Functions for handler
@@ -60,6 +63,7 @@ function Home() {
     socket.on("user:online_users_loaded", handleOnlineUsersLoaded);
     socket.on("group:list_loaded", handleGroupListLoaded);
     socket.on("group:list_updated", handleGroupChange);
+    socket.on("group:created", handleGroupCreated);
     socket.on("group:deleted", handleGroupChange);
     socket.on("user:online", handleUserChange);
     socket.on("user:offline", handleUserChange);
@@ -70,6 +74,7 @@ function Home() {
       socket.off("user:online_users_loaded", handleOnlineUsersLoaded);
       socket.off("group:list_loaded", handleGroupListLoaded);
       socket.off("group:list_updated", handleGroupChange);
+      socket.off("group:created", handleGroupCreated);
       socket.off("group:deleted", handleGroupChange);
       socket.off("user:online", handleUserChange);
       socket.off("user:offline", handleUserChange);
