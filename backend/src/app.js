@@ -10,7 +10,8 @@ import { setupSocketEvents } from './sockets/index.js';
 const app = express();
 
 const allowedOrigins = [
-    'http://localhost:5173',
+    "http://localhost:5173",
+    "https://stinky-chat.vercel.app",
     process.env.FRONTEND_URL,
 ].filter(Boolean);
 
