@@ -27,9 +27,11 @@ export default function Chat() {
   const [chatHistory, setChatHistory] = useState([]);
   const [user, setUser] = useState(null);
   const [groupDetail, setGroupDetail] = useState(null);
-  const [isLeader, setIsLeader] = useState(false);
-
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+
+  const isLeader =
+    chatType === "GROUP" &&
+    user?.username === groupDetail?.leaderName;
 
   const scrollToBottom = () => {
     chatContainerRef.current?.scrollTo({
@@ -95,6 +97,10 @@ export default function Chat() {
       socket.emit("private:get_history", { receiverName: targetName });
     else socket.emit("group:get_history", { groupName: targetName });
   };
+  const handleGroupUserLeft = () => {
+    socket.emit("group:get_detail", { groupName: targetName });
+    socket.emit("group:get_history", { groupName: targetName });
+  };
 
   useEffect(() => {
     if (!isConnected) {
@@ -125,6 +131,7 @@ export default function Chat() {
       socket.on("group:history_loaded", handleChatLoaded);
       socket.on("group:message_received", handleChatUpdated);
       socket.on("group:reaction_updated", handleChatUpdated);
+      socket.on("group:user_left", handleGroupUserLeft);
     }
 
     // Cleanup Function
@@ -141,17 +148,10 @@ export default function Chat() {
         socket.off("group:history_loaded", handleChatLoaded);
         socket.off("group:message_received", handleChatUpdated);
         socket.off("group:reaction_updated", handleChatUpdated);
+        socket.off("group:user_left", handleGroupUserLeft);
       }
     };
-  }, [isConnected, navigate, socket]);
-
-  useEffect(() => {
-    if (chatType === "GROUP" && user && groupDetail) {
-      setIsLeader(user.username === groupDetail.leaderName);
-    } else {
-      setIsLeader(false);
-    }
-  }, [user, groupDetail, chatType]);
+  }, [isConnected, navigate, socket, chatType, targetName]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -185,12 +185,17 @@ export default function Chat() {
                   const onlineUser = userList.find(
                     (u) => u?.username === option.senderName,
                   );
+
+                  const sender =
+                    option.senderName === "Anonymous"
+                      ? { username: "Anonymous", avatarId: 0 }
+                      : onlineUser;
                   return (
                     <ChatBox
                       key={index}
                       isSender={option.senderName === user.username}
                       message={option.text}
-                      sender={onlineUser}
+                      sender={sender}
                       user={user}
                       reactions={option.reactions}
                       onEmote={(emoji) => handleReact(option._id, emoji)}

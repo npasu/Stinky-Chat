@@ -49,9 +49,9 @@ export function ChatBox({
   return (
     <div className={`${alignment} flex w-full gap-3`}>
       {/* Profile Image Left */}
-      {!isSender && sender && (
+      {!isSender && (
         <img
-          src={`/profile${sender.avatarId || 0}.svg`}
+          src={`/profile${sender?.avatarId || 1}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />
@@ -110,7 +110,7 @@ export function ChatBox({
       {/* Profile Image Right */}
       {isSender && (
         <img
-          src={`/profile${user.avatarId || 0}.svg`}
+          src={`/profile${user.avatarId || 1}.svg`}
           alt=""
           className="w-12 h-12 rounded-full object-cover"
         />
